@@ -409,9 +409,13 @@ no `.env`, no wallet, no API key and no account on the default path.
 ### Installation
 
 ```bash
+git clone --recurse-submodules <repo-url>   # lib/forge-std is a submodule; only `npm test` needs it
 npm install
 npm run dev                    # http://localhost:3000  ·  /judge for the one-page argument
 ```
+
+Already cloned without it? `git submodule update --init` — the demo path above does not care, but
+`forge` resolves `forge-std/` from `lib/forge-std/src/` and nowhere else.
 
 ### Reproducing the live proof
 

@@ -68,7 +68,8 @@ npm install && npm run dev            # → http://localhost:3000
 node scripts/capture-proof.mjs --check
 # → "committed artifact MATCHES a fresh live capture"
 
-# the contract suite
+# the contract suite (needs the forge-std submodule: clone with --recurse-submodules,
+# or run `git submodule update --init` once — nothing else here does)
 npm test                              # forge test --summary — 120 tests, 4 suites
 
 # the E2E suite (needs a build first)
