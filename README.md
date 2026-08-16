@@ -18,6 +18,12 @@
 
   [![Live demo](https://img.shields.io/badge/▶️_Live_demo-index41-0ea5e9?style=for-the-badge)](https://index41.edycu.dev)
   [![Judge in 30 seconds](https://img.shields.io/badge/⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
+  [![Pitch deck](https://img.shields.io/badge/📊_Pitch_deck-10_pages_PDF-e11d48?style=for-the-badge)](docs/index41-pitch-deck.pdf)
+  <!-- Demo video: points at DEMO.md until the recording is uploaded. When the YouTube URL exists,
+       swap the href below for it (https://www.youtube.com/watch?v=…) and update, in this order:
+       submission/links.md → submission/submission-text.md → the deck → the video end card →
+       the BUIDL page. Do NOT ship a badge that links nowhere. -->
+  [![Demo video](https://img.shields.io/badge/▶️_Demo_video-2_min_55-ff0000?style=for-the-badge)](DEMO.md)
   [![The ruling on Blockscout](https://img.shields.io/badge/⛓️_The_ruling-on_Blockscout-22c55e?style=for-the-badge)](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810)
   [![The proof pipeline](https://img.shields.io/badge/🔬_The-proof_pipeline-f59e0b?style=for-the-badge)](docs/PIPELINE.md)
   [![Built for BUIDL CTC 2026 Fall](https://img.shields.io/badge/DoraHacks-BUIDL_CTC_2026_Fall-8b5cf6?style=for-the-badge)](https://dorahacks.io/hackathon/buidl-ctc-2026-fall)

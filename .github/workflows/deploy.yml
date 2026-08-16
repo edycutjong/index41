@@ -1,0 +1,156 @@
+name: deploy
+
+# Production deploy to Vercel, chained to the release.
+#
+# Ordering: `release` derives the semantic version, pushes the `chore(release):`
+# bump and the tag, then this workflow runs on its completion — so what ships to
+# production is always a tagged, versioned commit rather than whatever happened
+# to be on main at the time.
+#
+# IMPORTANT — turn OFF Vercel's own Git integration for this project, or every
+# push deploys twice (once by Vercel, once here) and the two race for the alias.
+# In the Vercel dashboard: Project → Settings → Git → disable "Automatic
+# deployments from Git", or commit `{"git": {"deploymentEnabled": false}}` in
+# vercel.json. This workflow is then the single path to production.
+#
+# Secrets required (Settings → Secrets and variables → Actions). These are
+# GitHub secrets — never a file in this repository:
+#   VERCEL_TOKEN       Account Settings → Tokens
+#   VERCEL_ORG_ID      from `.vercel/project.json` after `vercel link`
+#   VERCEL_PROJECT_ID  same file
+#
+# No marketplace actions: the deploy path holds a production token, and a
+# third-party action here would inherit it unpinned.
+
+on:
+  workflow_run:
+    workflows: ["release"]
+    types: [completed]
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Which target to deploy"
+        type: choice
+        options: ["production", "preview"]
+        default: "production"
+
+permissions:
+  contents: read
+
+concurrency:
+  # one production deploy at a time; a newer commit supersedes an in-flight one
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy a release that actually succeeded. A failed or cancelled
+    # release must never reach production.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # workflow_run checks out the default branch tip, which is what we
+          # want: it includes the version-bump commit the release just pushed.
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify the deploy credentials exist
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          missing=""
+          [ -n "$VERCEL_TOKEN" ]      || missing="$missing VERCEL_TOKEN"
+          [ -n "$VERCEL_ORG_ID" ]     || missing="$missing VERCEL_ORG_ID"
+          [ -n "$VERCEL_PROJECT_ID" ] || missing="$missing VERCEL_PROJECT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing — add them under Settings → Secrets and variables → Actions. See the header of this workflow for where each value comes from."
+            exit 1
+          fi
+
+      - name: Report what is being deployed
+        run: |
+          echo "### Deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- commit: \`$(git rev-parse --short HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- version: \`$(node -p "require('./package.json').version")\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- tag: \`$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo none)\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install the Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull the Vercel environment
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          TARGET="${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}"
+          vercel pull --yes --environment="$TARGET" --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ "${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}" = "production" ]; then
+            vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+          else
+            vercel build --token="${{ secrets.VERCEL_TOKEN }}"
+          fi
+
+      - name: Deploy
+        id: deploy
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}" = "production" ]; then
+            url=$(vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")
+          else
+            url=$(vercel deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}")
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "- deployment: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke-test the deployment
+        run: |
+          set -euo pipefail
+          url="${{ steps.deploy.outputs.url }}"
+
+          # The page is the whole submission — a deploy that returns 200 but
+          # cannot read the chain is a broken demo, so check both.
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "$url")
+          echo "GET $url -> $code"
+          [ "$code" = "200" ] || { echo "::error::Deployment did not return 200"; exit 1; }
+
+          mode=$(curl -sS --max-time 45 "$url/api/proof" | node -e "
+            let s='';
+            process.stdin.on('data', d => s += d);
+            process.stdin.on('end', () => {
+              try { console.log(JSON.parse(s).provenance?.mode ?? 'unparseable'); }
+              catch { console.log('unparseable'); }
+            });
+          ")
+          echo "/api/proof provenance.mode -> $mode"
+          # the only two values ProvenanceMode can take — app/_lib/proof.ts:23
+          case "$mode" in
+            live-chain-read|cached-proof-artifact)
+              echo "- provenance: \`$mode\`" >> "$GITHUB_STEP_SUMMARY" ;;
+            *)
+              echo "::error::/api/proof returned provenance.mode=$mode — expected live-chain-read or cached-real-proof"
+              exit 1 ;;
+          esac
