@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img"
+     aria-label="index41 — The instant laterality decodes, three slate transactions lock into gold indices 41 → 42 → 43 — position becomes fact.">
+<!-- STORYBOARD (dur 6s — this file's single master dur)
+  0-10%   steady state: the full mark — plate, three rows carrying their own indices
+          41 / 42 / 43, row 42 gold. Poster rule: brand fully visible at t=0.
+  10-13%  trigger: the claim arrives — the index cells go EMPTY and the rows scatter: three
+          same-block transactions with no sequence, which is all the victim ever had  data-story="beat-2"
+  24-40%  mechanism: The instant laterality decodes, three slate transactions lock into gold indices 41 → 42 → 43 — position becomes fact.   data-story="beat-3"
+          (41, then 42, then 43 land IN SEQUENCE, 210ms apart — 41 and 43 flash a gold ring as
+          they land, 42's landing is the glow surge on its own row)
+  34-50%  resolution: SandwichProven — a gold ring seals outward from row 42; the lit state persists  data-story="beat-4"
+  50-100% rest: the poster, unbroken, for the last 3.0s. Every story layer is 0 by 50%, so the
+          restart cannot hard-cut. The mark is the MARK 4.6s of every 6s (77%); the longest
+          moment it is not is 1.38s.
+-->
+  <style>
+    /* the poster is the finished mark, so hiding the story layers leaves a complete static icon;
+       one state-driven glow animation on row 42 remains (declared, not hidden) */
+    @media (prefers-reduced-motion: reduce) { [data-story] { display: none !important; } }
+  </style>
+  <defs>
+    <linearGradient id="goldRow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE29A"/>
+      <stop offset="55%" stop-color="#FFC53D"/>
+      <stop offset="100%" stop-color="#E8A200"/>
+    </linearGradient>
+    <linearGradient id="slateRow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#587B9E"/>
+      <stop offset="100%" stop-color="#4A6885"/>
+    </linearGradient>
+    <filter id="rowGlow" x="-40%" y="-120%" width="180%" height="340%">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+  </defs>
+
+  <!-- ============ BRAND LAYER — fully visible at t=0 (poster) ============ -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="#0B1220"/>
+  <rect x="34" y="34" width="444" height="444" rx="94" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="4"/>
+
+  <!-- row 41 — index 41 -->
+  <rect x="80" y="109" width="124" height="70" rx="14" fill="none" stroke="#587B9E" stroke-width="8"/>
+  <g transform="translate(101.7,168.2) scale(0.789)" fill="#8FB2D4">
+    <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M96.8 0L57.5 0L57.5-9.2L73.4-9.2L73.4-52L57.4-40.1L57.4-51.2L71.5-61.3L83.9-61.3L83.9-9.2L96.8-9.2"/>
+  </g>
+  <rect x="222" y="109" width="164" height="70" rx="14" fill="url(#slateRow)"/>
+
+  <!-- row 42 — gold, glow breathes (dims while the claim is unordered, surges at the relight) -->
+  <rect x="80" y="221" width="352" height="70" rx="14" fill="url(#goldRow)" filter="url(#rowGlow)" opacity="0.5">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0.5;0.5;0.12;0.12;0.85;0.5;0.5" keyTimes="0;0.10;0.20;0.28;0.38;0.55;1"/>
+  </rect>
+  <rect x="80" y="221" width="124" height="70" rx="14" fill="url(#goldRow)"/>
+  <g transform="translate(101.7,280.2) scale(0.789)" fill="#0B1220">
+    <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M95.3 0L57 0L57-10.2L76.2-29.4Q80.2-33.5 82.2-36.8Q84.1-40.2 84.1-43.7Q84.1-48 81.7-50.4Q79.4-52.8 75.3-52.8Q70.9-52.8 68.4-50.2Q65.9-47.6 65.9-43.1L55.4-43.1Q55.4-49 57.9-53.2Q60.4-57.5 64.9-59.8Q69.5-62.2 75.5-62.2Q81.3-62.2 85.6-60Q89.9-57.8 92.2-53.8Q94.6-49.9 94.6-44.4Q94.6-38.8 91.7-33.5Q88.8-28.1 82.4-22L69.6-9.5L95.3-9.5"/>
+  </g>
+  <rect x="222" y="221" width="210" height="70" rx="14" fill="url(#goldRow)"/>
+
+  <!-- row 43 — index 43 -->
+  <rect x="80" y="333" width="124" height="70" rx="14" fill="none" stroke="#587B9E" stroke-width="8"/>
+  <g transform="translate(101.7,392.2) scale(0.789)" fill="#8FB2D4">
+    <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M75 0.8Q69 0.8 64.6-1.3Q60.2-3.5 57.8-7.5Q55.4-11.4 55.4-16.8L65.9-16.8Q65.9-12.7 68.3-10.4Q70.7-8.1 75.1-8.1Q79.5-8.1 81.8-10.4Q84.2-12.8 84.2-16.8L84.2-21.6Q84.2-25.7 81.8-28Q79.5-30.3 75.1-30.3L68.2-30.3L68.2-39.8L81.7-52.3L58.1-52.3L58.1-61.3L92.4-61.3L92.4-51.8L75.1-36L75.1-39.3Q84.2-39.3 89.5-34.5Q94.8-29.7 94.8-21.6L94.8-16.8Q94.8-11.4 92.3-7.5Q89.9-3.5 85.4-1.3Q81 0.8 75 0.8"/>
+  </g>
+  <rect x="222" y="333" width="164" height="70" rx="14" fill="url(#slateRow)"/>
+
+  <!-- ============ STORY LAYER — all groups start invisible ============ -->
+
+  <!-- beat 2/3: the unordered veils. Each hides its indexed row and shows the claim as it
+       actually arrives: an EMPTY index cell and a dim, out-of-line bar. They lift IN SEQUENCE
+       (41, then 42, then 43) — the relight is the ordering.
+       Polish pass 2 retimed all three: the veils are up 0.60s-1.98s, so the mark IS the mark for
+       4.6s of every 6s (77%). Before this pass the icon showed empty slate boxes for 2.4-2.7s —
+       nearly half the loop spent not being the brand, the wrong trade for a mark that lives at
+       96px in a README. -->
+  <g data-story="beat-2" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;1;1;0;0" keyTimes="0;0.10;0.13;0.24;0.26;1"/>
+    <rect x="72" y="101" width="372" height="86" rx="18" fill="#0B1220"/>
+    <rect x="88" y="105" width="124" height="70" rx="14" fill="none" stroke="#3E5871" stroke-width="8"/>
+    <rect x="230" y="105" width="164" height="70" rx="14" fill="#587B9E" opacity="0.4"/>
+  </g>
+  <g data-story="beat-2" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;1;1;0;0" keyTimes="0;0.10;0.13;0.275;0.295;1"/>
+    <rect x="72" y="213" width="372" height="86" rx="18" fill="#0B1220"/>
+    <rect x="74" y="219" width="124" height="70" rx="14" fill="none" stroke="#3E5871" stroke-width="8"/>
+    <rect x="216" y="219" width="210" height="70" rx="14" fill="#587B9E" opacity="0.4"/>
+  </g>
+  <g data-story="beat-2" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;1;1;0;0" keyTimes="0;0.10;0.13;0.31;0.33;1"/>
+    <rect x="72" y="325" width="372" height="86" rx="18" fill="#0B1220"/>
+    <rect x="82" y="331" width="124" height="70" rx="14" fill="none" stroke="#3E5871" stroke-width="8"/>
+    <rect x="224" y="331" width="164" height="70" rx="14" fill="#587B9E" opacity="0.4"/>
+  </g>
+
+  <!-- beat 3: each index flashes gold at the instant it lands, then settles to its resting state.
+       41 and 43 get a ring; 42's landing is carried by the glow surge above, because a gold ring
+       on a gold row is gold on gold. The laterality-bit ticks that used to live here went with
+       the bits themselves — see icon.svg. -->
+  <g data-story="beat-3" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;0.9;0;0" keyTimes="0;0.24;0.27;0.33;1"/>
+    <rect x="80" y="109" width="124" height="70" rx="14" fill="none" stroke="#FFC53D" stroke-width="8"/>
+  </g>
+  <g data-story="beat-3" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;0.9;0;0" keyTimes="0;0.31;0.34;0.40;1"/>
+    <rect x="80" y="333" width="124" height="70" rx="14" fill="none" stroke="#FFC53D" stroke-width="8"/>
+  </g>
+
+  <!-- beat 4: SandwichProven — a gold ring seals outward from row 42 -->
+  <g data-story="beat-4" opacity="0">
+    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
+             values="0;0;0.55;0;0" keyTimes="0;0.34;0.37;0.50;1"/>
+    <circle cx="256" cy="256" r="40" fill="none" stroke="#FFC53D" stroke-width="6">
+      <animate attributeName="r" dur="6s" repeatCount="indefinite"
+               values="40;40;190;190" keyTimes="0;0.34;0.48;1"/>
+    </circle>
+  </g>
+</svg>
