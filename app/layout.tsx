@@ -103,8 +103,21 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * This surface is dark-only, and that is a design decision rather than an
+ * omission. The signature moment is a ledger row *lighting gold* the instant
+ * merkle laterality decodes: `--accent` #FFC53D measures 11.9:1 on `--bg-base`
+ * #070B12 and about 1.7:1 on white, so on a light ground the one event the
+ * product exists to show would be invisible.
+ *
+ * Declaring `colorScheme` is what makes that choice explicit to the browser:
+ * it paints the canvas dark before CSS arrives (no white flash), renders
+ * scrollbars and form controls in dark chrome, and stops user-agent auto-dark
+ * from inverting a page that is already dark.
+ */
 export const viewport: Viewport = {
   themeColor: '#070b12',
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
 };

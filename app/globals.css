@@ -11,6 +11,12 @@
    ========================================================================== */
 
 :root {
+  /* Dark-only by design — see the note on `viewport.colorScheme` in layout.tsx.
+     Declared in CSS as well as in the metadata so the rule survives even if the
+     document is rendered without the Next.js head (a saved page, an embed, or
+     the raw HTML opened from disk). */
+  color-scheme: dark;
+
   --primary: #587b9e;
   --accent: #ffc53d;
   --primary-glow: color-mix(in srgb, var(--primary) 35%, transparent);
