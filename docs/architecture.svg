@@ -19,6 +19,7 @@
     .dim  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#7E90A8 }
     .mute { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-size:12.5px; fill:#8FA1B8 }
     .gold { fill:#FFC53D }
+    .wm-num { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-weight:700 }
     .grn  { fill:#4ADE80 }
     .num  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; font-weight:700; fill:#0B1220 }
   </style>
@@ -26,7 +27,9 @@
   <rect class="bg" width="1280" height="700"/>
 
   <!-- ══ title ══ -->
-  <text x="40" y="46" class="h" font-size="20">index41 — position becomes a fact</text>
+  <!-- wordmark: "index" in the display sans, "41" in gold mono — the same split
+       the HTML surfaces use (.brand .name / .brand .name .num) -->
+  <text x="40" y="46" class="h" font-size="20">index<tspan class="gold wm-num">41</tspan> — position becomes a fact</text>
   <text x="40" y="70" class="mute">Ordering is carried in no payload. The merkle authentication path <tspan font-style="italic">is</tspan> the position, and Creditcoin will decode it on-chain.</text>
 
   <!-- ═══════════ 1. ETHEREUM MAINNET ═══════════ -->
