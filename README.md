@@ -94,9 +94,10 @@ Ethereum transaction hashes from the same block. `Index41.proveSandwich` then:
    `INativeQueryVerifier.calculateTxIndex(merkleProof)` — a free `view` that decodes position out of
    the left/right laterality of the merkle authentication path. Every sibling on the path is one
    bit; the position is the *shape of the proof*, not a claimed field.
-3. **Asserts the sandwich shape**: `frontRunIndex < victimIndex < backRunIndex`, the same pool as
-   `to` on all three, the same searcher as sender on the outer two, and a higher priority fee on the
-   front-run.
+3. **Asserts the sandwich shape**: `frontRunIndex < victimIndex < backRunIndex`, that all three legs
+   emitted a `Swap` log *from the same pool address* (`PoolNotTouched` otherwise — note this is the
+   log emitter, not the transaction's `to`, which legitimately differs across routers), the same
+   searcher as sender on the outer two, and a higher priority fee on the front-run.
 4. **Computes harm** as the attacker's *realized profit* — front-run `amountIn` versus back-run
    `amountOut`, both read from `Swap` logs that are inside the proof. Never a counterfactual against
    a pre-sandwich reserve ratio: Attestcoin commits transaction history, not state, so there is no
@@ -264,7 +265,9 @@ hold. Those are different security models, and only one of them survives the com
 
 **You would also need a bespoke indexer to make individual fields checkable in a contract.**
 Ordering alone does not make a sandwich. The claim also requires that all three transactions hit the
-same pool (`to`), that the outer two share a sender, that the front-run paid the higher priority
+same pool — which means a `Swap` log *emitted by* that pool inside each leg's proven receipt, not a
+matching `to` address, since the three legs in the demo route through different contracts — that the
+outer two share a sender, that the front-run paid the higher priority
 fee, and — for harm — the `amountIn` and `amountOut` of the `Swap` logs the attacker actually
 emitted. Today those come out of the *same verified bytes* through `EvmV1Decoder`'s selectors and
 `utils.decoder.decodeEvmV1Transaction`, so every field the contract branches on is inside the thing
