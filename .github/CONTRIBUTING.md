@@ -44,7 +44,7 @@ scans the full history in CI and will fail the build.
 
 ```bash
 npm run ci     # lint + typecheck + forge fmt --check + 120 forge tests + npm audit
-npm run e2e    # Playwright, 48 tests (needs `npm run build` first)
+npm run e2e    # Playwright, 54 tests (needs `npm run build` first)
 ```
 
 - Add or update tests for any behavior change. Name regression tests after the defect they pin,

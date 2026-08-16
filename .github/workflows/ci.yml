@@ -269,5 +269,5 @@ jobs:
           echo "  ✅ Stage 2 — Secrets:    gitleaks (full history) + TruffleHog"
           echo "  ✅ Stage 2 — Deps:       npm audit (production tree, blocking) + licences"
           echo "  ✅ Stage 3 — Build:      next build + bundle budget"
-          echo "  ✅ Stage 4 — E2E:        Playwright, 48 tests, chromium + mobile"
+          echo "  ✅ Stage 4 — E2E:        Playwright, 54 tests (27 × chromium + 27 × mobile-chrome)"
           echo "  ✅ Stage 5 — Perf:       Lighthouse CI, a11y hard-gated at 0.9"

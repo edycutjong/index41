@@ -6,7 +6,7 @@
 
 ## Checklist
 - [ ] `npm run ci` passes (ESLint, tsc, `forge fmt --check`, 120 forge tests, npm audit)
-- [ ] `npm run build && npm run e2e` passes (Playwright, 48 tests)
+- [ ] `npm run build && npm run e2e` passes (Playwright, 54 tests)
 - [ ] Tests added/updated, and named after the defect they pin
 - [ ] No key, `.env`, or kitchen file added — `npm run secrets` is clean
 - [ ] Docs / README updated if behavior changed
