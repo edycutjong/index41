@@ -62,9 +62,15 @@ const config: Config = {
           '55%': { transform: 'scale(1.14)', opacity: '1' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        // The scan band that crosses a row while its laterality is being read. It fades up as it
+        // enters and fades away as it leaves, so the band never pops in or cuts out at full
+        // strength. Opacity is keyed inside the pass rather than at the edges because the
+        // gradient is widest — and so most visible — in the middle of its travel.
         sweep: {
-          '0%': { transform: 'translateX(-110%)' },
-          '100%': { transform: 'translateX(210%)' },
+          '0%': { transform: 'translateX(-110%)', opacity: '0' },
+          '12%': { opacity: '1' },
+          '88%': { opacity: '1' },
+          '100%': { transform: 'translateX(210%)', opacity: '0' },
         },
       },
       animation: {
@@ -72,7 +78,12 @@ const config: Config = {
         'accordion-up': 'accordion-up 220ms cubic-bezier(0.4,0,0.2,1)',
         rise: 'rise 620ms cubic-bezier(0.16,1,0.3,1) both',
         land: 'land 420ms cubic-bezier(0.16,1,0.3,1) both',
-        sweep: 'sweep 1.1s cubic-bezier(0.4,0,0.2,1)',
+        // `linear` and not an ease: adding opacity keyframes at 12%/88% introduces timing-function
+        // boundaries the transform would otherwise be re-eased across, which reads as a stutter
+        // mid-travel. A constant-velocity scan is also the more instrument-like motion here.
+        // `infinite` because a row stays active for ~2s — longer than one pass — and the old
+        // single run had no fill-mode, so it reverted to a static band parked on the row.
+        sweep: 'sweep 1.1s linear infinite',
       },
     },
   },
