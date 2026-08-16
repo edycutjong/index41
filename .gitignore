@@ -1,5 +1,10 @@
+# Secrets. The signing key lives in ~/.config/creditcoin/, never in the tree — but a stray .env
+# is the classic way one arrives, so it is ignored before anything else. The template is not.
 .env
 .env.*
+!.env.example
+*.key
+*.pem
 node_modules/
 __pycache__/
 .next/
@@ -25,3 +30,18 @@ scratch/
 # Next 16 can regenerate these; this repo is public and they do not belong in it
 /AGENTS.md
 /CLAUDE.md
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# lighthouse ci
+/.lighthouseci/
+
+# the kitchen. specs/, _ideas/, _specs/ and predictions live one level up and never enter this
+# repo; these lines exist so an accidental copy is refused rather than committed.
+/specs/
+/submission/
+/graphify-out/

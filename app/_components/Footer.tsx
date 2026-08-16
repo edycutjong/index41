@@ -20,16 +20,28 @@ interface InjectedProvider {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
 }
 
-export function Footer({ view }: { view: ProofView }) {
-  const [wallet, setWallet] = React.useState<'absent' | 'idle' | 'busy' | 'added'>('absent');
+const injectedProvider = () => (window as unknown as { ethereum?: InjectedProvider }).ethereum;
 
-  React.useEffect(() => {
-    const injected = (window as unknown as { ethereum?: InjectedProvider }).ethereum;
-    if (injected) setWallet('idle');
-  }, []);
+/**
+ * "Is a wallet injected?" is a fact about the browser, not React state, so it is read through
+ * `useSyncExternalStore` rather than assigned from an effect. The server snapshot is `false` —
+ * the markup Next renders assumes no wallet, which is also the honest default for this page.
+ * Providers inject before hydration, so there is nothing to subscribe to.
+ */
+function useInjectedWallet(): boolean {
+  return React.useSyncExternalStore(
+    () => () => {},
+    () => Boolean(injectedProvider()),
+    () => false,
+  );
+}
+
+export function Footer({ view }: { view: ProofView }) {
+  const hasWallet = useInjectedWallet();
+  const [wallet, setWallet] = React.useState<'idle' | 'busy' | 'added'>('idle');
 
   async function addChain() {
-    const injected = (window as unknown as { ethereum?: InjectedProvider }).ethereum;
+    const injected = injectedProvider();
     if (!injected) return;
     setWallet('busy');
     try {
@@ -122,7 +134,7 @@ export function Footer({ view }: { view: ProofView }) {
             </p>
 
             <div className="mt-5">
-              {wallet === 'absent' ? (
+              {!hasWallet ? (
                 <p className="font-mono text-[0.625rem] leading-relaxed text-low">
                   No wallet detected — and none is needed. Everything above was read from a public node.
                 </p>

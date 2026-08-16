@@ -1,0 +1,34 @@
+version: 2
+
+# Grouped, monthly, and no majors on purpose. A frozen hackathon submission is an artifact: a
+# `next` 16→17 or `@types/node` 22→26 PR cannot be merged unattended without risking the demo a
+# judge is about to click, so that whole class is ignored. Dependabot SECURITY alerts are a
+# separate repo setting and stay on regardless of what is listed here.
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # lib/forge-std — the Foundry standard library, vendored as a git submodule.
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2

@@ -21,7 +21,18 @@
     "spike": "tsx scripts/spike.ts",
     "prove": "FOUNDRY_PROFILE=cc3 forge build && tsx src/prove.ts",
     "find-sandwich": "tsx scripts/find-sandwich.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "fmt:sol": "forge fmt",
+    "fmt:sol:check": "forge fmt --check",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "lighthouse": "lhci autorun",
+    "audit": "npm audit --omit=dev --audit-level=high",
+    "secrets": "gitleaks git --no-banner --redact . && gitleaks dir --no-banner --redact .",
+    "ci": "npm run lint && npm run typecheck && npm run fmt:sol:check && npm run test && npm run audit",
+    "ci:full": "npm run ci && npm run build && npm run e2e"
   },
   "dependencies": {
     "@gluwa/usc-contracts": "^0.1.2",
@@ -37,10 +48,15 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^22.10.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.1",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",

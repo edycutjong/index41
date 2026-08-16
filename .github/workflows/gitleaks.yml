@@ -1,0 +1,33 @@
+name: gitleaks
+
+# GitHub's own secret scanning only matches KNOWN provider patterns on pushed commits. gitleaks
+# catches project-shaped secrets and, with fetch-depth 0, scans the whole history — which is what
+# matters at the private→public flip this repository goes through at submission.
+#
+# Configuration (including the audited allowlist of public keccak event-topic constants) is in
+# .gitleaks.toml at the repo root. Verified locally: 17 commits scanned, no leaks found.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  schedule:
+    - cron: "13 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan full history
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml

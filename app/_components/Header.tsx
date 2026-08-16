@@ -13,6 +13,8 @@ const NAV = [
   { href: '#provenance', label: 'Provenance' },
   { href: '#evidence', label: 'Evidence' },
   { href: '#faq', label: 'FAQ' },
+  // The one destination that is a page rather than a section: everything a judge needs, in order.
+  { href: '/judge', label: 'For judges' },
 ];
 
 export function Header() {
@@ -36,7 +38,9 @@ export function Header() {
     >
       <div className="mx-auto flex h-16 max-w-[78rem] items-center gap-6 px-5 sm:px-8">
         <a href="#top" className="group flex shrink-0 items-center gap-2.5" aria-label="index41 home">
-          {/* the project mark itself — same file the README and the favicon use */}
+          {/* the project mark itself — same file the README and the favicon use.
+              A 2 KB inline SVG: next/image would add a request and a loader to optimise nothing. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icon.svg"
             alt=""

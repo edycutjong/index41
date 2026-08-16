@@ -57,12 +57,38 @@ function buildTimeline(legs: ProofView['legs']): Beat[] {
 
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * "Has this reader asked the machine to stop moving things?" is a fact about the browser, not
+ * React state, so it is read through `useSyncExternalStore` and stays live if the OS setting
+ * changes mid-visit. The server snapshot is `false`, matching a first paint that has not yet
+ * animated anything.
+ */
+function usePrefersReducedMotion(): boolean {
+  return React.useSyncExternalStore(
+    (onChange) => {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      mq.addEventListener('change', onChange);
+      return () => mq.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => false,
+  );
+}
+
 export function ProofTheatre({ view }: { view: ProofView }) {
   const timeline = React.useMemo(() => buildTimeline(view.legs), [view.legs]);
   const total = timeline.length;
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   // `cursor` = how many beats have played. `total` means "everything is on screen".
-  const [cursor, setCursor] = React.useState(0);
+  //
+  // A reader who has asked for reduced motion is shown the finished ledger immediately — that is
+  // derived from the media query, not assigned to state, so nothing has to re-render to reach it.
+  // Pressing Play or Replay is an explicit request and overrides that from then on.
+  const [rawCursor, setCursor] = React.useState(0);
+  const [interacted, setInteracted] = React.useState(false);
+  const cursor = prefersReducedMotion && !interacted ? total : rawCursor;
   const [running, setRunning] = React.useState(false);
   const startedOnce = React.useRef(false);
 
@@ -80,17 +106,11 @@ export function ProofTheatre({ view }: { view: ProofView }) {
     return () => clearTimeout(t);
   }, [running, cursor, total, timeline]);
 
-  React.useEffect(() => {
-    if (cursor >= total) setRunning(false);
-  }, [cursor, total]);
-
   // Autoplay once, when the ledger is actually on screen — and never for a reader who has asked
   // the machine to stop moving things.
   const ledgerRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      setCursor(total);
+    if (prefersReducedMotion) {
       startedOnce.current = true;
       return;
     }
@@ -109,14 +129,16 @@ export function ProofTheatre({ view }: { view: ProofView }) {
     );
     io.observe(node);
     return () => io.disconnect();
-  }, [total]);
+  }, [prefersReducedMotion]);
 
   const replay = () => {
+    setInteracted(true);
     setCursor(0);
     setRunning(true);
     startedOnce.current = true;
   };
   const jumpToEnd = () => {
+    setInteracted(true);
     setRunning(false);
     setCursor(total);
     startedOnce.current = true;

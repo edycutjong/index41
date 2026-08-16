@@ -1,0 +1,47 @@
+name: "CodeQL"
+
+# CodeQL has no Solidity analyser, so the Solidity side is covered by `forge fmt --check`,
+# `forge build --sizes` and 120 unit tests in ci.yml. What CodeQL does cover here is everything
+# that touches the network or a filesystem path: the TypeScript proving pipeline (src/), the
+# capture scripts, and the Next.js app — including the allowlisted /evidence route.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Weekly, so a newly-published rule finds this repo even after the submission is frozen.
+    - cron: "27 4 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

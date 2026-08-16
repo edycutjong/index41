@@ -1,0 +1,56 @@
+# gitleaks configuration for index41
+#
+# This repository never contains a key. The relay/deployer signing key is read at runtime from
+# ~/.config/creditcoin/index41-testnet.json (see src/config.ts) and has never been in the tree.
+# `gitleaks git` over the full history and `gitleaks dir` over the working tree must both come
+# back clean — that is a hard gate in .github/workflows/gitleaks.yml and `make security-scan`.
+#
+# Everything allowlisted below was inspected individually and is a PUBLIC CONSTANT, not a secret.
+# Nothing here is broad enough to hide a real key: in particular there is deliberately NO
+# blanket `0x[0-9a-f]{64}` allowlist, because a raw EVM private key has exactly that shape.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = """
+Build output and vendored code. `.next/` holds Next.js' per-build preview signing/encryption keys
+(.previewinfo, .rscinfo, prerender-manifest.json, server-reference-manifest.json) — regenerated on
+every `next build`, never committed, and meaningless outside a local dev server. The rest are
+package/artifact directories that are all in .gitignore.
+"""
+paths = [
+  '''^\.next/''',
+  '''^node_modules/''',
+  '''^out/''',
+  '''^cache/''',
+  '''^broadcast/''',
+  '''^scratch/''',
+  '''^lib/forge-std/''',
+  '''^playwright-report/''',
+  '''^test-results/''',
+  '''^\.lighthouseci/''',
+  '''package-lock\.json$''',
+]
+
+[[allowlists]]
+description = """
+`SWAP_TOPICS` in src/eth.ts (and its pre-rename path scripts/lib/eth.ts, which is why history
+trips on it too) is a lookup table of keccak256 event signature hashes for the AMMs that carry
+mainnet flow. These are public protocol constants — verifiable with one command, e.g.
+  cast keccak "TokenExchange(address,int128,uint256,int128,uint256)"
+  -> 0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140
+The allowlist is scoped to that one file AND to these exact literal values, so any other 64-hex
+string anywhere in the repo is still a finding.
+"""
+paths = ['''(^|/)eth\.ts$''']
+regexTarget = "match"
+regexes = [
+  '''0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822''',
+  '''0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67''',
+  '''0x40e9cecb9f5f1f1c5b9c97dec2917b7ee92e57ba5563708daca94dd84ad7112f''',
+  '''0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b''',
+  '''0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140''',
+  '''0xb2e76ae99761dc136e598d4a629bb347eccb9532a5f8bbd72e18467c3c34cc98''',
+  '''0x19b47279256b2a23a1665c810c8d55a1758940ee09377d4f8d26497a3577dc83''',
+]

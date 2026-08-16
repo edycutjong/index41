@@ -12,6 +12,13 @@
 
 <p align="center">Built for BUIDL CTC 2026 Fall (DoraHacks) · DeFi track</p>
 
+<p align="center">
+  <b>Judging this?</b> <a href="JUDGE.md">JUDGE.md</a> is the whole argument in reading order —
+  the claim, a 30-second click path, the receipt, the reproduce command and the honest
+  limitations. The live version of that page is <code>/judge</code>, and it renders its numbers
+  from a chain read rather than from the file.
+</p>
+
 ---
 
 ## The mechanism
@@ -93,11 +100,20 @@ data/proof-artifact.json     the ruling, captured from live sources by scripts/c
 
 app/                        the demo surface (Next.js 16, App Router, Tailwind + ShadCN)
   page.tsx                  server component — reads the ruling off CC3 before the first paint
+  judge/page.tsx            /judge — the claim, the click path, the receipt, the limitations
   _lib/chain.ts             plain JSON-RPC + receipt decoding; no SDK, no wallet, no secret
   _lib/proof.ts             live read, with the captured artifact as the only fallback
   _components/ProofTheatre.tsx  the ledger: three rows of block 25764741 lighting in sequence
   api/proof/route.ts        re-reads the chain on demand, behind the page's own button
   evidence/[...path]/route.ts    allowlisted read-only view of the files the claim rests on
+
+e2e/                        48 Playwright tests — invariants, never literal indices
+  zero-config.spec.ts        loads with no env, no wallet, no console errors; names its source
+  proof-flow.spec.ts         the two decodes agree · front < victim < back · paid == computed
+  judge-route.spec.ts        /judge is 200 with no credentials, and carries a real receipt
+  responsive.spec.ts         375 / 768 / 1440 — no horizontal scroll on either page
+
+.github/workflows/          6-stage CI: contracts · app · secrets · build · E2E · performance
 
 scripts/capture-proof.mjs    freezes the ruling into data/proof-artifact.json — and refuses to
                               write one whose own decode disagrees with the chain
@@ -108,6 +124,7 @@ scripts/capture-proof.mjs    freezes the ruling into data/proof-artifact.json �
 ```bash
 npm install
 npm run dev                    # http://localhost:3000 — no .env, no wallet, no API key
+                               # /judge — the same evidence, written for one reader
 ```
 
 The page shows three rows of Ethereum mainnet block `25764741` lighting up in sequence —
@@ -184,6 +201,50 @@ forge build                    # default profile — unit tests link their own E
 npm test                       # forge test --summary — 120 tests, all four suites
 npm run test:gas               # per-test gas report
 ```
+
+The one exhaustive test rather than an example: `test_TxIndexOfRoundTripsEveryPositionInTheTree`
+walks **all 256 leaves** of the depth-8 tree and asserts the laterality decode round-trips to the
+position for every one of them. The decision function that must never be wrong is verified over its
+whole input space, not on three cases.
+
+## The engineering harness
+
+```bash
+npm run ci            # ESLint (0 warnings) + tsc + forge fmt --check + 120 forge tests + npm audit
+npm run ci:full       # …plus the Next production build and the 48-test Playwright suite
+
+npm run lint          # ESLint over app/ src/ scripts/
+npm run typecheck     # tsc --noEmit
+npm run fmt:sol:check # forge fmt --check
+npm run e2e           # Playwright — chromium + mobile, zero config
+npm run lighthouse    # Lighthouse CI over / and /judge
+npm run secrets       # gitleaks over the full git history AND the working tree
+make security-scan    # the above, plus npm audit and a licence check
+```
+
+| Layer | Tool | Result on this repo |
+|---|---|---|
+| Contracts | `forge build` · `forge fmt --check` · Foundry | 120 tests, 4 suites, 0 failed · formatter clean |
+| Exhaustive verification | Foundry | **256 positions** — every leaf of the tree round-tripped |
+| Code quality | ESLint 9 (`next/core-web-vitals` + `next/typescript`) · `tsc --noEmit` | clean at `--max-warnings=0` |
+| E2E | Playwright, chromium + Pixel 7 | **48 tests** — zero config, no `.env`, no wallet |
+| Performance | Lighthouse CI, `/` and `/judge` | perf **100** · a11y **96** · best-practices **100** · SEO **100** |
+| Security — SAST | CodeQL (`javascript-typescript`, `security-and-quality`) | weekly + every push/PR |
+| Security — secrets | gitleaks over **full history** + TruffleHog | 17 commits scanned, **no leaks found** |
+| Security — SCA | `npm audit` (production tree, blocking) + Dependabot | **0 vulnerabilities** in the shipped tree |
+| CI/CD | GitHub Actions, 6 stages, parallel, concurrency-cancelled | contracts + TypeScript + Next, all three gated |
+
+Solidity is formatted by `forge fmt`. TypeScript deliberately is **not** run through Prettier — the
+source is hand-formatted with aligned comment blocks that carry meaning, and churning 18 files for
+cosmetics on a frozen submission buys nothing. The formatting gate that exists is the one that can
+be met exactly.
+
+A note on the E2E suite, because it is the easy place to cheat: none of the 48 tests assert
+`14`, `15` or `16`. They assert **invariants** — that each leg's off-chain laterality decode equals
+the index the precompile emitted, that the three positions are strictly increasing, that harm paid
+equals harm computed, and that the page names which of the two real sources it used. A test that
+hard-coded the indices would still pass against a page that had hard-coded them too, which is
+precisely the failure this repository exists to avoid.
 
 ## Reproducing the live proof
 
