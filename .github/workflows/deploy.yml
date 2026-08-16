@@ -149,12 +149,21 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        # `--archive=tgz` uploads the prebuilt output as ONE tarball instead of file by file.
+        # Without it this step failed on the runner with
+        #   ENOENT: lstat '/vercel/path0/node_modules/next/dist/lib/constants.js'
+        # after uploading 1573 files — the per-file path had lost the prebuilt output and Vercel
+        # fell back to building remotely, where node_modules is not present. The same
+        # `vercel deploy --prebuilt --prod` succeeds locally against an identical
+        # `.vercel/output` (84 files), so the failure is in how the output is transferred, not in
+        # the build. The tarball keeps the output intact and the deploy prebuilt, which is the
+        # whole point of building in CI.
         run: |
           set -euo pipefail
           if [ "${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}" = "production" ]; then
-            url=$(vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")
+            url=$(vercel deploy --prebuilt --archive=tgz --prod --token="${{ secrets.VERCEL_TOKEN }}")
           else
-            url=$(vercel deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}")
+            url=$(vercel deploy --prebuilt --archive=tgz --token="${{ secrets.VERCEL_TOKEN }}")
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "- deployment: $url" >> "$GITHUB_STEP_SUMMARY"
