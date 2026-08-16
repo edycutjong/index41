@@ -1,0 +1,105 @@
+index41 — SDK SPIKE
+proving that transaction A executed BEFORE transaction B inside an Ethereum block
+run at 2026-08-16T03:24:48.654Z
+
+── 1. Creditcoin CC3 testnet ───────────────────────────────────────────────
+rpc            https://rpc.cc3-testnet.creditcoin.network
+chainId        102031
+head           5317582
+signer         0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24
+balance        9999.9995082605 CTC
+gasPrice       0.5 gwei
+
+── 2. Attestcoin chain info (PrecompileChainInfoProvider, 0x…0fd3) ─────────
+chain key  3   chainId 1         Ethereum
+chain key  1   chainId 11155111  Sepolia ethereum
+
+attestation genesis        0
+latest attested (chain)    25764870  0xfed6efd8e4a88395f16c190c9f162ec2fa88703530ad647722ef99e5735bc5e4  isAttestation=true
+latest attested (prover)   25764870
+prover health              healthy cc3=true eth=true
+target block 25764741 is 129 blocks below the attested tip
+continuity bounds          parent 25764740 (attestation=true) child 25764750 (attestation=true) isAttested=true
+
+── 3. The sandwich, re-verified against Ethereum mainnet ───────────────────
+block          25764741  0x2cf1cf66d6fbf5771b4e972c88c2213c5b1647d08e1b9408ac705499859e8762
+pool           0xd91c72da93288f00385e3c2ead75623ebedf9272  (UniswapV2.Swap)
+searcher       0x11111215b72e894c60f24e91ac2c8ccb1d373911
+
+index  14  front-run  0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436
+           from 0x11111215b72e894c60f24e91ac2c8ccb1d373911  0.042377075 gwei effective
+index  15  victim     0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
+           from 0x51f400b9770ad2bddb7cf74664f5cd1daf6a1410  0.039283274 gwei effective
+index  16  back-run   0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
+           from 0x11111215b72e894c60f24e91ac2c8ccb1d373911  1.333361052 gwei effective
+
+mainnet agrees: same block, same pool, same searcher on the outer two, ascending positions.
+index41 does not trust any of the above. It is the ground truth the precompile must reproduce.
+
+── 4. Proofs — POST /api/v1/proof-batch/3 (by block position) ──────────────
+request        [{"headerNumber":25764741,"txIndexes":[14,15,16]}]
+response       chainKey=3 fromHeader=25764741 toHeader=25764741 cached=false in 536ms
+continuity     lowerEndpointDigest 0xf04f3547b0a75f1c40f71c62e5a2361e25b0781b6503b86bca0a23580888279f
+               10 roots — ONE proof shared by all three legs
+merkle root    0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16  (identical for all three — one block, one tree)
+
+the authentication paths, leaf → root (L = sibling on the left, so our node was on the right):
+
+  front-run  RLLLRRRR  ->   14   (8 siblings, txBytes 3520 bytes)
+  victim     LLLLRRRR  ->   15   (8 siblings, txBytes 6496 bytes)
+  back-run   RRRRLRRR  ->   16   (8 siblings, txBytes 3456 bytes)
+
+decoded independently in TypeScript, one bit per sibling. Creditcoin must now agree.
+
+── 5. calculateTxIndex — free eth_call against the precompile (0x…0FD2) ────
+  front-run  precompile.calculateTxIndex -> 14   (expected 14)
+  victim     precompile.calculateTxIndex -> 15   (expected 15)
+  back-run   precompile.calculateTxIndex -> 16   (expected 16)
+  SDK blockProver.computeTransactionIndex -> [14, 15, 16]
+
+── 6. THE ASSERTION ────────────────────────────────────────────────────────
+  index 14   searcher buy     0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436
+  index 15   the victim       0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
+  index 16   searcher sell    0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
+
+  14 < 15 < 16   — front-run BEFORE victim BEFORE back-run.
+  Creditcoin just read the position of a transaction inside an Ethereum block.
+  Cost so far: zero gas. calculateTxIndex is a view.
+
+── 7. THE GAS GATE — 3x verifyAndEmit in ONE Creditcoin transaction ────────
+deploying OrderProbe (calls verifyAndEmit three times, then asserts ordering)…
+OrderProbe     0xCcDf3BE685852d9EdB2B5C14BaA9ca0eBF47502A
+deploy tx      0x7b80725070119b029d6783530abbf68ec1b6abce175b333dcd42dc718191ccc0  (gas 691103)
+explorer       https://creditcoin-testnet.blockscout.com/address/0xCcDf3BE685852d9EdB2B5C14BaA9ca0eBF47502A
+calldata       16228 bytes
+eth_call       proveOrder -> [14, 15, 16]  (no gas spent)
+estimateGas    315294  (0.42% of MAX_GAS_CAP)
+sending with gasLimit 378352…
+
+CC3 tx hash    0x42f725dd8c875185b216b6bbda01d37e12f605c4e8dbd832e7649a8abeeedd02
+block          5317584   status 1
+explorer       https://creditcoin-testnet.blockscout.com/tx/0x42f725dd8c875185b216b6bbda01d37e12f605c4e8dbd832e7649a8abeeedd02
+GAS USED       292376
+MAX_GAS_CAP    75000000
+               0.380% of the cap — FITS
+event          OrderProven(3, 25764741, 14, 15, 16)
+precompile     TransactionVerified(chainKey=3, height=25764741, txIndex=14)
+precompile     TransactionVerified(chainKey=3, height=25764741, txIndex=15)
+precompile     TransactionVerified(chainKey=3, height=25764741, txIndex=16)
+               4 logs total
+               the precompile ITSELF reports 14, 15, 16 — not our contract, not our script.
+
+── VERDICT ─────────────────────────────────────────────────────────────────
+
+  calculateTxIndex recovers block position from merkle laterality:  YES
+  indices returned:                                                 14, 15, 16
+  strictly ascending (front < victim < back):                       YES
+  3x verifyAndEmit in one transaction under MAX_GAS_CAP:            YES (0.380%)
+
+  The premise holds. index41 is de-risked.
+
+  OrderProbe     0xCcDf3BE685852d9EdB2B5C14BaA9ca0eBF47502A
+  proveOrder tx  0x42f725dd8c875185b216b6bbda01d37e12f605c4e8dbd832e7649a8abeeedd02
+────────────────────────────────────────────────────────────────────────────
+finished 2026-08-16T03:25:17.484Z
+evidence written to docs/spike-output.txt
