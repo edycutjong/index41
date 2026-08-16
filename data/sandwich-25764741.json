@@ -1,0 +1,31 @@
+{
+  "note": "A real Ethereum mainnet sandwich, found by scripts/find-sandwich.ts. Searcher 0x11111215 front-runs and back-runs a victim swap on Uniswap V2 pool 0xd91c72da, all three transactions in block 25764741 at positions 14, 15, 16. The back-run pays 1.333 gwei against the front-run's 0.042 gwei: the searcher bids for the exit, not the entry.",
+  "chainKey": 3,
+  "chain": "Ethereum mainnet",
+  "blockNumber": 25764741,
+  "blockHash": "0x2cf1cf66d6fbf5771b4e972c88c2213c5b1647d08e1b9408ac705499859e8762",
+  "pool": "0xd91c72da93288f00385e3c2ead75623ebedf9272",
+  "poolProtocol": "UniswapV2.Swap",
+  "searcher": "0x11111215b72e894c60f24e91ac2c8ccb1d373911",
+  "frontRun": {
+    "index": 14,
+    "hash": "0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436",
+    "from": "0x11111215b72e894c60f24e91ac2c8ccb1d373911",
+    "to": "0x672061b75f770331b0c7c2a566a9ac0a9ba331d2",
+    "effectiveGasPriceGwei": 0.042377075
+  },
+  "victim": {
+    "index": 15,
+    "hash": "0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0",
+    "from": "0x51f400b9770ad2bddb7cf74664f5cd1daf6a1410",
+    "to": "0x6131b5fae19ea4f9d964eac0408e4408b66337b5",
+    "effectiveGasPriceGwei": 0.039283274
+  },
+  "backRun": {
+    "index": 16,
+    "hash": "0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a",
+    "from": "0x11111215b72e894c60f24e91ac2c8ccb1d373911",
+    "to": "0x672061b75f770331b0c7c2a566a9ac0a9ba331d2",
+    "effectiveGasPriceGwei": 1.333361052
+  }
+}
