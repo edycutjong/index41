@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   index41 — design tokens
+   Copied (not linked) from the project's portable token sheet so the site, the
+   icon and the OG card render one system. ONE axis: unordered -> ordered.
+   Steel-slate is a position that is merely CLAIMED. Data-gold is a position that
+   has been PROVEN. Nothing that is not a proven index is ever allowed to be gold.
+   ========================================================================== */
+
+:root {
+  --primary: #587b9e;
+  --accent: #ffc53d;
+  --primary-glow: color-mix(in srgb, var(--primary) 35%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 35%, transparent);
+  --primary-ink: #8fb2d4;
+
+  --unordered: var(--primary);
+  --indexed: var(--accent);
+
+  --bg-base: #070b12;
+  --bg-panel: #0b1220;
+  --bg-elevated: color-mix(in srgb, var(--bg-base) 60%, transparent);
+
+  --text-hi: #f8fafc;
+  --text-mid: #94a3b8;
+  --text-low: #475569;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.15);
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --gradient-index: linear-gradient(180deg, #ffe29a 0%, var(--accent) 55%, #e8a200 100%);
+  --gradient-mesh:
+    radial-gradient(ellipse 55% 60% at 18% 12%, var(--primary-glow) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 55% at 85% 80%, var(--accent-glow) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 90% at 50% 50%, color-mix(in srgb, var(--primary) 10%, transparent) 0%, transparent 70%);
+  --grid-bg:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 48px);
+
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-indexed: 0 0 28px var(--accent-glow);
+
+  --font-display: var(--font-space-grotesk), 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-hi);
+    font-family: var(--font-display);
+    font-feature-settings: 'ss01' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #1a1206;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---- the ledger plate: the surface a block is drawn on ------------------ */
+  .plate {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .gridfield {
+    background-image: var(--grid-bg);
+  }
+
+  .meshfield {
+    background-image: var(--gradient-mesh);
+  }
+
+  /* ---- the index cell: the single most important object on this site ------
+     A slot in a block. Slate + hollow while the position is only claimed;
+     solid gold with the numeral knocked out once the chain has emitted it. */
+  .index-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.5rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition:
+      background-color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 320ms;
+  }
+
+  .index-cell[data-state='claimed'] {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    color: var(--text-low);
+  }
+
+  .index-cell[data-state='proven'] {
+    background: var(--gradient-index);
+    border: 1px solid var(--accent);
+    color: #1a1206;
+    box-shadow: var(--shadow-indexed);
+  }
+
+  /* ---- a laterality bit chip -------------------------------------------- */
+  .bit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.55rem;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--text-low);
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .bit[data-lit='1'] {
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .bit[data-lit='0'] {
+    border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+    color: var(--primary-ink);
+  }
+
+  .rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+  }
+
+  .link-hash {
+    font-family: var(--font-mono);
+    color: var(--primary-ink);
+    text-decoration: none;
+    border-bottom: 1px dotted color-mix(in srgb, var(--primary-ink) 45%, transparent);
+    transition: color 160ms, border-color 160ms;
+  }
+
+  .link-hash:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-low);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Horizontal scroll containers must scroll themselves, never the page. */
+  .scroll-x {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-default) transparent;
+  }
+}

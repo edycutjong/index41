@@ -89,12 +89,50 @@ scripts/
   find-sandwich.ts            scans real Ethereum mainnet blocks for MEV sandwiches to feed in
 
 data/sandwich-25764741.json  the recorded real mainnet sandwich this repo's default run proves
+data/proof-artifact.json     the ruling, captured from live sources by scripts/capture-proof.mjs
+
+app/                        the demo surface (Next.js 16, App Router, Tailwind + ShadCN)
+  page.tsx                  server component — reads the ruling off CC3 before the first paint
+  _lib/chain.ts             plain JSON-RPC + receipt decoding; no SDK, no wallet, no secret
+  _lib/proof.ts             live read, with the captured artifact as the only fallback
+  _components/ProofTheatre.tsx  the ledger: three rows of block 25764741 lighting in sequence
+  api/proof/route.ts        re-reads the chain on demand, behind the page's own button
+  evidence/[...path]/route.ts    allowlisted read-only view of the files the claim rests on
+
+scripts/capture-proof.mjs    freezes the ruling into data/proof-artifact.json — and refuses to
+                              write one whose own decode disagrees with the chain
 ```
 
-There is no web front end. The demo surface is the CLI pipeline plus the Blockscout explorer links
-above — every claim in this README resolves to a real, independently-checkable Creditcoin
-transaction or Ethereum mainnet transaction, which is a stronger proof than a UI screenshot would
-be.
+## The demo surface
+
+```bash
+npm install
+npm run dev                    # http://localhost:3000 — no .env, no wallet, no API key
+```
+
+The page shows three rows of Ethereum mainnet block `25764741` lighting up in sequence —
+**14 searcher buy · 15 the victim · 16 searcher sell** — then `SandwichProven` and the bond paying
+out. **Those indices are not written anywhere in the web code.** They are decoded, on every page
+load, from the three `TransactionVerified` logs the Attestcoin precompile itself wrote inside the
+receipt of CC3 transaction [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810).
+A banner above the ledger states which of the two real sources is on screen — a **live chain read**,
+or the **captured artifact** if the public node is unreachable — and there is no third source.
+
+Alongside each index the page shows the laterality decode that produced it (`RLLLRRRR → 14`), the
+real sibling hashes it was folded from, and the position the precompile emitted, so the off-chain
+and on-chain answers can be seen agreeing rather than asserted to agree.
+
+```bash
+node scripts/capture-proof.mjs --check   # re-read every live source, diff the committed artifact
+```
+
+Every explorer link on the page resolves: Creditcoin links to Blockscout, Ethereum mainnet links to
+`eth.blockscout.com`, which also serves the position over its API for a one-line independent check:
+
+```bash
+curl -s https://eth.blockscout.com/api/v2/transactions/0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436 | jq .position
+# 14
+```
 
 ## Why only Attestcoin — the SDK is the engine
 
@@ -171,7 +209,10 @@ npm run typecheck              # tsc --noEmit
 hashes on Blockscout. **Cut deliberately:** a multi-relay registry (single bonded relay), a
 historical-claim browser (one claim, one demo), automatic sandwich detection (the caller supplies
 three tx hashes — `scripts/find-sandwich.ts` exists to find real ones, but the contract itself
-takes hashes, not a scan). No web front end shipped; see [Architecture](#architecture) above.
+takes hashes, not a scan). The web surface is deliberately **one page about one ruling**: it reads
+the chain and shows the decode, and it cannot submit a claim — claiming needs a funded key, which
+belongs in `npm run prove`, not in a judge's browser. Wallet connection is one optional button in
+the footer that adds the CC3 network; nothing on the default path touches it.
 
 ## Hard constraints this project is built to
 

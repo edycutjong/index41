@@ -1,0 +1,306 @@
+{
+  "$schema": "index41 proof artifact v1",
+  "capturedAt": "2026-08-16T04:56:41.374Z",
+  "capturedBy": "scripts/capture-proof.mjs",
+  "honesty": {
+    "statement": "Every number in this file was read from a live source at capture time. Nothing here is authored. The indices 14 / 15 / 16 are decoded from the Attestcoin precompile’s own TransactionVerified logs inside the receipt of a real Creditcoin transaction, and are independently re-derived from the laterality of the merkle authentication paths the proof service returned. The two agree, and mainnet agrees with both.",
+    "topicSelfCheck": "keccak256 of every event signature matches its hardcoded topic0",
+    "sources": {
+      "creditcoin": "https://rpc.cc3-testnet.creditcoin.network",
+      "ethereum": "https://ethereum-rpc.publicnode.com",
+      "prover": "https://prover.cc3-testnet.creditcoin.network/api/v1/proof-batch/3"
+    }
+  },
+  "events": {
+    "TransactionVerified": {
+      "signature": "TransactionVerified(uint64,uint64,uint64)",
+      "topic0": "0x8a8df984523447f746ce8bccdb04c87025c708eb62a2d070bdffb8945c8f391e",
+      "emitter": "the Attestcoin native query verifier precompile"
+    },
+    "SandwichProven": {
+      "signature": "SandwichProven(address,uint64,uint64,uint64,uint64,uint256,uint256)",
+      "topic0": "0xbb41c14a4b2500ad9e0d5a583435d6419982a9877d0efd00d1107d6177d9b9ac",
+      "emitter": "Index41"
+    },
+    "HarmPaid": {
+      "signature": "HarmPaid(address,address,uint256)",
+      "topic0": "0xdcdf799a3df7388e9f3178281e4f57547a2e7494e14d7d01762d0891eddef0af",
+      "emitter": "Index41"
+    }
+  },
+  "network": {
+    "name": "Creditcoin CC3 testnet",
+    "chainId": 102031,
+    "rpc": "https://rpc.cc3-testnet.creditcoin.network",
+    "explorer": "https://creditcoin-testnet.blockscout.com"
+  },
+  "claim": {
+    "txHash": "0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810",
+    "from": "0x9436ed9ac85f9e39a5ae44cd598651f272c45e24",
+    "to": "0xb37bc52b9d6f7431ba8be4ded4f53281efb10ec2",
+    "blockNumber": 5317821,
+    "blockHash": "0xe22fab123dc50749ceae635fee3c80469870ee33a0ea49b10688aec82cd6b502",
+    "blockTimestamp": 1786854270,
+    "status": 1,
+    "gasUsed": 1092100,
+    "gasLimit": 1539012,
+    "maxGasCap": 75000000,
+    "gasPercentOfCap": 1.456,
+    "logCount": 5,
+    "calldataBytes": 17860
+  },
+  "contract": {
+    "index41": "0xb37bc52b9d6f7431ba8be4ded4f53281efb10ec2",
+    "verifierPrecompile": "0x0000000000000000000000000000000000000fd2",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "relay": "0x9436ed9ac85f9e39a5ae44cd598651f272c45e24"
+  },
+  "source": {
+    "chainKey": 3,
+    "chain": "Ethereum mainnet",
+    "chainId": 1,
+    "blockNumber": 25764741,
+    "blockHash": "0x2cf1cf66d6fbf5771b4e972c88c2213c5b1647d08e1b9408ac705499859e8762",
+    "transactionsRoot": "0x9b3d1d744933e67abecaa5e78dabe94c0e508dd5731a8078db9d8c90616dbbe3",
+    "transactionCount": 240,
+    "timestamp": 1786848671,
+    "merkleRoot": "0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16",
+    "merkleDepth": 8,
+    "continuityRoots": 60,
+    "continuityLowerEndpointDigest": "0xf04f3547b0a75f1c40f71c62e5a2361e25b0781b6503b86bca0a23580888279f",
+    "proverCached": false,
+    "proverGeneratedAt": "2026-08-16T04:56:43.778570437Z",
+    "proverElapsedMs": 1170,
+    "mainnetPositions": {
+      "0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436": {
+        "index": 14,
+        "blockNumber": 25764741
+      },
+      "0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0": {
+        "index": 15,
+        "blockNumber": 25764741
+      },
+      "0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a": {
+        "index": 16,
+        "blockNumber": 25764741
+      }
+    }
+  },
+  "legs": [
+    {
+      "role": "front-run",
+      "label": "searcher buy",
+      "blurb": "the searcher moves the pool first",
+      "index": 14,
+      "indexSource": "TransactionVerified log emitted by the Attestcoin precompile",
+      "txHash": "0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436",
+      "txBytes": 3520,
+      "laterality": "RLLLRRRR",
+      "bits": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binaryLeafToRoot": "01110000",
+      "decodedFromLaterality": 14,
+      "merkleRoot": "0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16",
+      "siblings": [
+        {
+          "hash": "0x3d20aad91e0a0ab8e0fcdcb6e60f99b2ff9480934f426509498db24c9f8c51a2",
+          "isLeft": false
+        },
+        {
+          "hash": "0x39a67f4cffa227a727696d61be85278a3ff3f5b5d1749bcf0bebb7c56616f4d4",
+          "isLeft": true
+        },
+        {
+          "hash": "0x022956d4ba17d67cbe0db2dd51eaf400e9c4260a5ed7fe1a357ba2c8654ccb91",
+          "isLeft": true
+        },
+        {
+          "hash": "0xe81eba4d124ecc269df217bc76245420122b4926472105d2f0a0670564978e7b",
+          "isLeft": true
+        },
+        {
+          "hash": "0xb168d93675865c0e9d259552ff0363339734217568c061641833064e79fd9605",
+          "isLeft": false
+        },
+        {
+          "hash": "0xefc8dd4fa4de84dc97be0e298bb35a84967653cfbc31addf645db0dd447ba978",
+          "isLeft": false
+        },
+        {
+          "hash": "0x7af37fa744ba3260eaa3a91ddb331257ea28bcae5ff94664d26b5f503cb583c0",
+          "isLeft": false
+        },
+        {
+          "hash": "0xef11896dab9e7f6730257e9b8a2eca4bd31ea3d686a6691d5313bc0f66a16518",
+          "isLeft": false
+        }
+      ]
+    },
+    {
+      "role": "victim",
+      "label": "the victim",
+      "blurb": "the swap that gets the worse price",
+      "index": 15,
+      "indexSource": "TransactionVerified log emitted by the Attestcoin precompile",
+      "txHash": "0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0",
+      "txBytes": 6496,
+      "laterality": "LLLLRRRR",
+      "bits": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binaryLeafToRoot": "11110000",
+      "decodedFromLaterality": 15,
+      "merkleRoot": "0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16",
+      "siblings": [
+        {
+          "hash": "0xe4d8201c3555882f6bec1e1da07a1798585aa876e8c9405cc068f7c0ab39c334",
+          "isLeft": true
+        },
+        {
+          "hash": "0x39a67f4cffa227a727696d61be85278a3ff3f5b5d1749bcf0bebb7c56616f4d4",
+          "isLeft": true
+        },
+        {
+          "hash": "0x022956d4ba17d67cbe0db2dd51eaf400e9c4260a5ed7fe1a357ba2c8654ccb91",
+          "isLeft": true
+        },
+        {
+          "hash": "0xe81eba4d124ecc269df217bc76245420122b4926472105d2f0a0670564978e7b",
+          "isLeft": true
+        },
+        {
+          "hash": "0xb168d93675865c0e9d259552ff0363339734217568c061641833064e79fd9605",
+          "isLeft": false
+        },
+        {
+          "hash": "0xefc8dd4fa4de84dc97be0e298bb35a84967653cfbc31addf645db0dd447ba978",
+          "isLeft": false
+        },
+        {
+          "hash": "0x7af37fa744ba3260eaa3a91ddb331257ea28bcae5ff94664d26b5f503cb583c0",
+          "isLeft": false
+        },
+        {
+          "hash": "0xef11896dab9e7f6730257e9b8a2eca4bd31ea3d686a6691d5313bc0f66a16518",
+          "isLeft": false
+        }
+      ]
+    },
+    {
+      "role": "back-run",
+      "label": "searcher sell",
+      "blurb": "the searcher exits into the damage",
+      "index": 16,
+      "indexSource": "TransactionVerified log emitted by the Attestcoin precompile",
+      "txHash": "0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a",
+      "txBytes": 3456,
+      "laterality": "RRRRLRRR",
+      "bits": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "binaryLeafToRoot": "00001000",
+      "decodedFromLaterality": 16,
+      "merkleRoot": "0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16",
+      "siblings": [
+        {
+          "hash": "0xafce55c24e05e15cf1d614f0fce0a5e641665f7fc6f9412866fac24792689828",
+          "isLeft": false
+        },
+        {
+          "hash": "0x811a9758f40bcd6ab8aad255be363bee3936ebeb2fca847de7ff7646186a1078",
+          "isLeft": false
+        },
+        {
+          "hash": "0xa92766bb9a7c78fddd6d55c00ab989abb9ab87e4138b747c2123b14cdfd90fd6",
+          "isLeft": false
+        },
+        {
+          "hash": "0x708cac21e6a1617966f38a2a3fd6bd5b84a82706ddbfd1336e6a538e27ff4b14",
+          "isLeft": false
+        },
+        {
+          "hash": "0x4bd6193ee4afa323588985e8f237adf73de96128f5e7d4fa39d0257610e20f98",
+          "isLeft": true
+        },
+        {
+          "hash": "0xefc8dd4fa4de84dc97be0e298bb35a84967653cfbc31addf645db0dd447ba978",
+          "isLeft": false
+        },
+        {
+          "hash": "0x7af37fa744ba3260eaa3a91ddb331257ea28bcae5ff94664d26b5f503cb583c0",
+          "isLeft": false
+        },
+        {
+          "hash": "0xef11896dab9e7f6730257e9b8a2eca4bd31ea3d686a6691d5313bc0f66a16518",
+          "isLeft": false
+        }
+      ]
+    }
+  ],
+  "ruling": {
+    "logIndex": 3,
+    "emitter": "0xb37bc52b9d6f7431ba8be4ded4f53281efb10ec2",
+    "searcher": "0x11111215b72e894c60f24e91ac2c8ccb1d373911",
+    "blockHeight": 25764741,
+    "frontIndex": 14,
+    "victimIndex": 15,
+    "backIndex": 16,
+    "harm": "219708",
+    "paid": "219708"
+  },
+  "harmPaid": {
+    "logIndex": 4,
+    "emitter": "0xb37bc52b9d6f7431ba8be4ded4f53281efb10ec2",
+    "victim": "0x51f400b9770ad2bddb7cf74664f5cd1daf6a1410",
+    "relay": "0x9436ed9ac85f9e39a5ae44cd598651f272c45e24",
+    "amount": "219708"
+  },
+  "verifiedLogs": [
+    {
+      "logIndex": 0,
+      "emitter": "0x0000000000000000000000000000000000000fd2",
+      "chainKey": 3,
+      "height": 25764741,
+      "txIndex": 14,
+      "order": 0
+    },
+    {
+      "logIndex": 1,
+      "emitter": "0x0000000000000000000000000000000000000fd2",
+      "chainKey": 3,
+      "height": 25764741,
+      "txIndex": 15,
+      "order": 1
+    },
+    {
+      "logIndex": 2,
+      "emitter": "0x0000000000000000000000000000000000000fd2",
+      "chainKey": 3,
+      "height": 25764741,
+      "txIndex": 16,
+      "order": 2
+    }
+  ]
+}

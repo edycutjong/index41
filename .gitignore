@@ -16,3 +16,8 @@ scratch/
 /cache/
 /broadcast/
 *.log
+
+# next.js
+/.next/
+/next-env.d.ts
+*.tsbuildinfo

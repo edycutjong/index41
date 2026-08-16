@@ -8,6 +8,11 @@
     "node": ">=20"
   },
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "capture:proof": "node scripts/capture-proof.mjs",
+    "capture:check": "node scripts/capture-proof.mjs --check",
     "test": "forge test --summary",
     "test:verbose": "forge test --summary -vvv",
     "test:gas": "forge test --gas-report",
@@ -20,10 +25,25 @@
   },
   "dependencies": {
     "@gluwa/usc-contracts": "^0.1.2",
-    "@gluwa/usc-sdk": "0.18.0"
+    "@gluwa/usc-sdk": "0.18.0",
+    "@radix-ui/react-accordion": "^1.2.2",
+    "@radix-ui/react-slot": "^1.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.469.0",
+    "next": "^16.3.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
