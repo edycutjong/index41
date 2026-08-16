@@ -32,7 +32,12 @@
 
   --text-hi: #f8fafc;
   --text-mid: #94a3b8;
-  --text-low: #475569;
+  /* Was #475569, which measured 2.60:1 on --bg-base and 2.47:1 on --bg-panel — under WCAG AA's
+     4.5:1, and it failed everywhere at once because `.eyebrow` and every mono caption inherit it.
+     #7288a3 keeps the steel-slate hue and the three-tier hierarchy (hi 17.9 > mid 7.3 > low 5.1)
+     while clearing AA with margin. Not #6b7f99: at 4.57:1 it sits close enough to the threshold
+     that antialiasing over .gridfield can push a glyph under. */
+  --text-low: #7288a3;
 
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-default: rgba(255, 255, 255, 0.15);

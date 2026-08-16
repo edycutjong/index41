@@ -401,10 +401,19 @@ function DecodePane({
             {steps.map((step, i) => {
               const on = i < bitsShown;
               const sibling = leg.siblings[i];
+              // Progress is marked by tinting the row that HAS been read, not by dimming the ones
+              // that have not. The old `opacity-25` put every glyph in this table under 2:1 against
+              // the panel, and it was redundant anyway: an unread row already prints `·` and `—`
+              // instead of a side and a weight. Content carries the state; opacity only cost
+              // legibility, and no opacity value passes AA here — even 0.75 leaves --text-low at
+              // 3.4:1.
               return (
                 <tr
                   key={step.depth}
-                  className={cn('transition-opacity duration-300', on ? 'opacity-100' : 'opacity-25')}
+                  className={cn(
+                    'transition-colors duration-300',
+                    on ? 'bg-[color-mix(in_srgb,var(--accent)_7%,transparent)]' : 'bg-transparent',
+                  )}
                 >
                   <td className="py-1 text-low">{step.depth}</td>
                   <td className="py-1 pr-2 text-primary-ink">{sibling ? shortHash(sibling.hash, 6, 4) : '—'}</td>
