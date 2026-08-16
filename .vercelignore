@@ -1,24 +1,30 @@
-# What Vercel does not need to build the demo surface.
+# What Vercel does not need. Kept deliberately SMALL — see the warning below before adding to it.
 #
-# The web app is `app/` plus `data/proof-artifact.json`. The Foundry project, the proving
-# pipeline's build output and every local test artifact are irrelevant to the deployed page and
-# only slow the upload down. Nothing here is required at runtime: `/api/proof` reads the chain
-# over plain JSON-RPC and needs no key, no wallet and no `.env`.
+# The Foundry project's own build output and every local test artifact are irrelevant to the
+# deployed page. Nothing here is required at runtime: `/api/proof` reads the chain over plain
+# JSON-RPC and needs no key, no wallet and no `.env`.
 #
-# EVERY PATTERN HERE IS ANCHORED WITH A LEADING SLASH, and must stay that way.
-# These are gitignore semantics: a bare `lib/` matches a directory named `lib` at ANY depth, not
-# just this repo's Foundry `lib/`. That silently excluded `node_modules/next/dist/lib/**` from the
-# deploy upload, and `vercel deploy --prebuilt` then failed on the runner with
-#   ENOENT: lstat '/vercel/path0/node_modules/next/dist/lib/constants.js'
-# because `.vc-config.json` lists those files in its `filePathMap` (1506 of its 1570 entries point
-# into node_modules) and expects the deploy step to ship them. `out/` and `cache/` are the same
-# trap — npm packages contain directories with both names.
+# TWO RULES, both learned from a deploy that failed four times in a row:
+#
+# 1. ANCHOR EVERY PATTERN WITH A LEADING SLASH. These are gitignore semantics, so a bare `lib/`
+#    matches a directory named lib at ANY depth — including `node_modules/next/dist/lib/`, which
+#    the deployment needs. That produced
+#      ENOENT: lstat '/vercel/path0/node_modules/next/dist/lib/constants.js'
+#    on the runner. `out/` and `cache/` are the same trap: npm packages contain both names.
+#
+# 2. DO NOT IGNORE ANYTHING THE PREBUILT OUTPUT REFERENCES. `vercel build` writes a `filePathMap`
+#    into each `.vc-config.json` naming the files the function expects at deploy time — ~27k
+#    entries here, spanning node_modules, .next, docs, src, lib, data, contracts and scripts.
+#    (`docs/`, `contracts/`, `src/` and `data/` are not dead weight: the `/evidence/[...path]`
+#    route serves those files at runtime.) Ignoring one is not a smaller upload, it is a broken
+#    deploy — `/.next/` here cost an ENOENT on `.next/package.json`.
+#
+# To check a candidate before adding it:
+#   python3 -c "import json,glob;print({k.split('/')[0] for f in glob.glob('.vercel/output/functions/**/.vc-config.json',recursive=True) for k in (json.load(open(f)).get('filePathMap') or {})})"
 
-/lib/
 /out/
 /cache/
 /broadcast/
-/.next/
 /test-results/
 /playwright-report/
 /blob-report/
