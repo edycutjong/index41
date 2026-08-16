@@ -151,6 +151,6 @@ jobs:
             live-chain-read|cached-proof-artifact)
               echo "- provenance: \`$mode\`" >> "$GITHUB_STEP_SUMMARY" ;;
             *)
-              echo "::error::/api/proof returned provenance.mode=$mode — expected live-chain-read or cached-real-proof"
+              echo "::error::/api/proof returned provenance.mode=$mode — expected live-chain-read or cached-proof-artifact"
               exit 1 ;;
           esac
