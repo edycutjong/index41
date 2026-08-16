@@ -7,6 +7,8 @@ import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
+import { blockProver } from '@gluwa/usc-sdk';
+
 export const CC3 = {
   chainId: 102031,
   rpcUrl: 'https://rpc.cc3-testnet.creditcoin.network',
@@ -17,8 +19,19 @@ export const CC3 = {
 /** Attestcoin source-chain KEY (not an EVM chain id). 1 = Sepolia, 3 = Ethereum mainnet. */
 export const ETHEREUM_CHAIN_KEY = 3;
 
-/** The Attestcoin native query verifier precompile. */
-export const VERIFIER_PRECOMPILE = '0x0000000000000000000000000000000000000FD2';
+/**
+ * The Attestcoin native query verifier precompile — taken from the SDK's own constant rather
+ * than retyped, so a protocol move relocates us for free.
+ */
+export const VERIFIER_PRECOMPILE = blockProver.BLOCK_PROVER_PRECOMPILE_ADDRESS;
+
+/**
+ * Creditcoin's pre-deployed `EvmV1Decoder`. Its functions are `public`, so the library is an
+ * EXTERNAL one: Index41 links against this address on CC3, and the pipeline calls the very same
+ * copy off-chain through {@link https://www.npmjs.com/package/@gluwa/usc-sdk | utils.decoder}
+ * so the preflight decode is byte-for-byte the decode the contract will perform.
+ */
+export const EVM_V1_DECODER = '0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f';
 
 export const DEFAULT_KEYFILE = join(homedir(), '.config', 'creditcoin', 'index41-testnet.json');
 

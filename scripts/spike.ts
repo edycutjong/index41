@@ -29,8 +29,8 @@ import { fileURLToPath } from 'node:url';
 import { Contract, ContractFactory, JsonRpcProvider, Wallet, formatEther, formatUnits, id } from 'ethers';
 import { blockProver, chainInfo, utils } from '@gluwa/usc-sdk';
 
-import { CC3, ETHEREUM_CHAIN_KEY, VERIFIER_PRECOMPILE, loadAccount } from './lib/config.js';
-import { getTx, hexToNum } from './lib/eth.js';
+import { CC3, ETHEREUM_CHAIN_KEY, VERIFIER_PRECOMPILE, loadAccount } from '../src/config.js';
+import { getTx, hexToNum } from '../src/eth.js';
 import {
   attestedHeight,
   health,
@@ -39,7 +39,7 @@ import {
   leg,
   proofBatchByIndex,
   type TransactionMerkleProof,
-} from './lib/prover.js';
+} from '../src/prover-api.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..');

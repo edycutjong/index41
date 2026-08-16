@@ -1,0 +1,46 @@
+[
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0xEa3516CED22587e1918DC80a93BE7dCB781BD73A",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0xa71605bd77aa43fdec71e5cfe582011f48f6769a3b44e6feaa18c56d71d5b5bd",
+    "deployBlock": 5317735,
+    "deployedAt": "2026-08-16T04:03:00.592Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0xEa3516CED22587e1918DC80a93BE7dCB781BD73A"
+  },
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0x06e43833f7b78C7E5EE328C81cFf96e81a9D70ec",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0x8f1e0934123e85bad8b1ea74275d64a4861e21677990e58551873850a737d01d",
+    "deployBlock": 5317757,
+    "deployedAt": "2026-08-16T04:08:31.654Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0x06e43833f7b78C7E5EE328C81cFf96e81a9D70ec"
+  },
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0x2084C677901067f15c59C48beFeb168b26982DDD",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0x9837e1f2a0ed6ca837ed3c04bbf86241a9e8d9cbb51cec9fd791b03dedb32df7",
+    "deployBlock": 5317766,
+    "deployedAt": "2026-08-16T04:10:47.096Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD"
+  },
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0xc5F604B76240dc606509e1319d8B30D518566C33",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0x3e4e0bcfc8bce94e2fcb2a12bfa957031851761f9f27b623e4203a5e7d9ad2cf",
+    "deployBlock": 5317783,
+    "deployedAt": "2026-08-16T04:15:01.571Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33"
+  }
+]

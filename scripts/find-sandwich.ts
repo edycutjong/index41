@@ -27,7 +27,7 @@ import {
   type RawBlock,
   type RawReceipt,
   type RawTx,
-} from './lib/eth.js';
+} from '../src/eth.js';
 
 const PROVER_URL = 'https://prover.cc3-testnet.creditcoin.network';
 const ETHEREUM_CHAIN_KEY = 3;

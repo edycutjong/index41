@@ -1,0 +1,107 @@
+index41 — THE PROVING PIPELINE
+three Ethereum mainnet transaction hashes in, one Creditcoin ruling out
+run at 2026-08-16T04:11:56.799Z
+
+── 0. Input ──────────────────────────────────────────────────────────────────
+no hashes given — using the recorded sandwich in data/sandwich-25764741.json
+  A real Ethereum mainnet sandwich, found by scripts/find-sandwich.ts. Searcher 0x11111215 front-runs and back-runs a victim swap on Uniswap V2 pool 0xd91c72da, all three transactions in block 25764741 at positions 14, 15, 16. The back-run pays 1.333 gwei against the front-run's 0.042 gwei: the searcher bids for the exit, not the entry.
+
+  front-run  0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436
+  victim     0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
+  back-run   0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
+
+── 1. Networks ───────────────────────────────────────────────────────────────
+creditcoin      https://rpc.cc3-testnet.creditcoin.network · chainId 102031 · head 5317770
+ethereum        https://ethereum-rpc.publicnode.com · head 25765143
+signer          0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · 9996.9916771165 CTC
+verifier        0x0000000000000000000000000000000000000FD2 (from the SDK's own constant)
+decoder         0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f (Creditcoin's deployed EvmV1Decoder)
+prover          https://prover.cc3-testnet.creditcoin.network
+source chain    key 3 → chainId 1 (attestation genesis 0)
+
+── 2. Resolve the block and the three positions ──────────────────────────────
+  front-run  block 25764741  position  14  from 0x11111215b72e894c60f24e91ac2c8ccb1d373911
+  victim     block 25764741  position  15  from 0x51f400b9770ad2bddb7cf74664f5cd1daf6a1410
+  back-run   block 25764741  position  16  from 0x11111215b72e894c60f24e91ac2c8ccb1d373911
+
+Those positions come from an Ethereum RPC and index41 does not act on them.
+They are the ground truth the Creditcoin precompile has to reproduce, unaided.
+
+── 3. Attestation — adaptive, not a flat sleep loop ──────────────────────────
+prover health   healthy · cc3=true eth=true · up 464048s
+
+asking the prover for a height it cannot possibly serve, to see how it says no:
+  HTTP 422 BlockNotReady: The continuity proof cannot be created because block 25765103 is not attested to yet. Last attested block: 25765100
+  retriable=true block_number=25765103 last_attested_block=25765100
+  → 3 blocks behind, so the adaptive poller would sleep 36s, not a flat 15s
+
+attested tip    25765100 0x61c44727c6215ce169f5a76eeb8f2d50d624d88e98fab535c9ffa549fe8b01ed (isAttestation=true)
+waitUntilHeight returned after 355ms · block is 359 below the tip, so extraDelayMs=0 (the SDK default of 15000 would have added 15000ms of nothing)
+prover ready    after 1 attempt(s), 0ms slept, schedule [] · attested-height 25765100
+continuity      parent 25764700 (attestation=false) → child 25764800 (attestation=false)
+
+── 4. Proofs — three interchangeable sources, hosted last-resort-free ────────
+  hosted:proof-batch (by block position)
+      trusts: https://prover.cc3-testnet.creditcoin.network — POST /api/v1/proof-batch/{chain_key}
+  hosted:ProofBuilder.getBatchProof (SDK, by tx hash)
+      trusts: https://prover.cc3-testnet.creditcoin.network — POST /api/v1/proof-batch-by-tx/{chain_key}, via the SDK client
+  local:RawProofBuilder (no hosted prover)
+      trusts: an Ethereum RPC + the Creditcoin chain-info precompile. No proof service.
+
+  ✓ hosted:proof-batch (by block position) — 527ms
+
+source used     hosted:proof-batch (by block position)
+                fromHeader=25764741 toHeader=25764741 cached=false
+                60 continuity roots, fetched ONCE for all 3 legs
+
+── 5. Audit — the source gets no benefit of the doubt ────────────────────────
+leaf → root, one bit of laterality per sibling (L = sibling on the left):
+
+  front-run  RLLLRRRR  →   14   merkle ok · leaf matches mainnet · 3520 bytes
+  victim     LLLLRRRR  →   15   merkle ok · leaf matches mainnet · 6496 bytes
+  back-run   RRRRLRRR  →   16   merkle ok · leaf matches mainnet · 3456 bytes
+
+merkle root     0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16
+continuity      60 roots covering 25764741..25764800
+  chains to     0x5492ed3ccc5cc7055fba39eedfed0b3cdc11b8de7bbebc866a1e4642ffa5d197
+  recognised    as a checkpoint at height 25764800
+
+Every byte was re-derived from Ethereum and bound to Creditcoin state before a claim existed.
+
+── 6. Decode — through Creditcoin's own EvmV1Decoder, the copy the contract links to ─
+  front-run  type 2 · from 0x11111215b72E894C60F24E91ac2c8cCb1D373911 · to 0x672061B75F770331b0c7C2a566a9Ac0A9BA331D2
+             status 1 · gasUsed 116894 · 4 logs · maxPriorityFeePerGas 3196467 · decode cost 533805 gas
+  victim     type 2 · from 0x51f400b9770aD2BDdb7CF74664F5Cd1DAF6A1410 · to 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5
+             status 1 · gasUsed 179643 · 8 logs · maxPriorityFeePerGas 102666 · decode cost 659115 gas
+  back-run   type 2 · from 0x11111215b72E894C60F24E91ac2c8cCb1D373911 · to 0x672061B75F770331b0c7C2a566a9Ac0A9BA331D2
+             status 1 · gasUsed 84829 · 4 logs · maxPriorityFeePerGas 1294180444 · decode cost 532145 gas
+
+pool            0xd91c72da93288f00385e3c2ead75623ebedf9272  (the Swap emitter common to all three legs — not their `to`)
+numeraire       token1
+searcher        0x11111215b72E894C60F24E91ac2c8cCb1D373911
+victim          0x51f400b9770aD2BDdb7CF74664F5Cd1DAF6A1410 · entry point 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5
+
+  front-run paid in   46827428
+  victim  paid in     100000000
+  back-run took out   47047136
+  realized profit     219708   ← this is the harm, and it is inside the proof
+
+── 7. Dry run — every verification, for free, before any gas is spent ────────
+  front-run  verifySingle=true · calculateTxIndex=14 (mainnet says 14)
+  victim     verifySingle=true · calculateTxIndex=15 (mainnet says 15)
+  back-run   verifySingle=true · calculateTxIndex=16 (mainnet says 16)
+
+  14 < 15 < 16   — front-run BEFORE victim BEFORE back-run. Cost so far: zero gas.
+
+── 8. The court ──────────────────────────────────────────────────────────────
+reusing Index41 at 0x2084C677901067f15c59C48beFeb168b26982DDD (deployed 2026-08-16T04:10:47.096Z)
+bonding 0.000000000000219708 CTC for relay 0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24…
+Index41         0x2084C677901067f15c59C48beFeb168b26982DDD
+relay           0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · bond 1.0 CTC · covers 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5=true
+claim id        0x614797006ffc0dde2116854291d5d94a83b9f5bb6e8d3412aa58ada39ebe7e93
+
+── ALREADY RULED ─────────────────────────────────────────────────────────────
+This court ruled on this exact sandwich at unix 1786853490: harm 219708, paid 219708.
+The replay guard is doing its job — three per-leg query ids and the composite claim id
+were all burned by that ruling, so nothing can claim it a second time here.
+Run again with --fresh-court to have a new court rule on it independently.
