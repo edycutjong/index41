@@ -14,8 +14,19 @@ name: release
 # source. Everything below is `actions/checkout`, node, and `gh`, which is
 # preinstalled on the runner.
 
+# Gated on CI, not on the push. Triggering on `push` would run this in parallel
+# with the test suite and could tag a release from a commit whose contracts,
+# typecheck or E2E had just failed. The chain is:
+#
+#   push → CI/CD Pipeline → (success) → release (tag + GitHub release) → deploy
+#
+# Loop safety: the version-bump commit this workflow pushes carries `[skip ci]`,
+# so CI does not run for it, so no `workflow_run` fires and nothing re-releases.
+# The head-commit guard below is the belt to that braces.
 on:
-  push:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types: [completed]
     branches: ["main"]
   workflow_dispatch:
     inputs:
@@ -35,18 +46,38 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Skip the commit this workflow itself pushes, or it would release forever.
+    # Release only a green CI run, and never the commit this workflow itself
+    # pushed. On a workflow_run event the payload is under `workflow_run` —
+    # `github.event.head_commit` does not exist there and would read as empty.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      !startsWith(github.event.head_commit.message, 'chore(release):')
+      (github.event.workflow_run.conclusion == 'success' &&
+       !startsWith(github.event.workflow_run.head_commit.message, 'chore(release):'))
     permissions:
       contents: write # create the tag, push the version bump, cut the release
     steps:
       - uses: actions/checkout@v4
         with:
+          # The bump commit lands on main, so check out the branch rather than
+          # the validated SHA — pushing from a detached commit that main has
+          # moved past would be rejected anyway.
+          ref: main
           fetch-depth: 0 # the whole log — the bump is derived from it
           # persist-credentials is needed to push the version-bump commit back
           persist-credentials: true
+
+      - name: Guard — main must still be the commit CI validated
+        id: guard
+        if: github.event_name == 'workflow_run'
+        run: |
+          head="$(git rev-parse HEAD)"
+          validated="${{ github.event.workflow_run.head_sha }}"
+          if [ "$head" != "$validated" ]; then
+            echo "::notice::main has moved past the commit CI validated ($validated -> $head); that newer commit has its own CI run, so this one stands down."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -80,6 +111,7 @@ jobs:
       - name: Tag, bump and release
         if: >-
           steps.v.outputs.should_release == 'true' &&
+          steps.guard.outputs.stale != 'true' &&
           !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
         env:
           GH_TOKEN: ${{ github.token }}
