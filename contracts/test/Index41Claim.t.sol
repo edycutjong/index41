@@ -191,6 +191,19 @@ contract Index41ClaimTest is Index41Base {
     }
 
     // -----------------------------------------------------------------------------------
+    // Transaction type validity
+    // -----------------------------------------------------------------------------------
+
+    /// @dev EvmV1Decoder recognises types 0-4 only; a fifth type must be rejected before any
+    ///      type-specific chunk is touched.
+    function test_RejectUnsupportedTransactionType() public {
+        Index41Base.Scenario memory s = _defaults();
+        s.frontType = 5;
+        vm.expectRevert(abi.encodeWithSelector(Index41.UnsupportedTransactionType.selector, uint256(0), uint8(5)));
+        court.proveSandwich(_claim(s));
+    }
+
+    // -----------------------------------------------------------------------------------
     // Same block
     // -----------------------------------------------------------------------------------
 

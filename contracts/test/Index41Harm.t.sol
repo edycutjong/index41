@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {Index41} from "../src/Index41.sol";
-import {Index41Base, StubbornVictim, GasHungryVictim} from "./helpers/Index41Base.sol";
+import {Index41Base, StubbornVictim, GasHungryVictim, ReentrantVictim} from "./helpers/Index41Base.sol";
 
 /**
  * @title Index41HarmTest
@@ -263,6 +263,27 @@ contract Index41HarmTest is Index41Base {
         court.withdrawPayout();
 
         assertEq(court.deferredPayout(address(stubborn)), 1 ether, "the credit survives a failed pull");
+    }
+
+    /// @dev The push payout is a raw `.call`, made while {Index41-proveSandwich}'s own
+    ///      `nonReentrant` guard is still armed. A victim whose fallback tries to re-enter the
+    ///      court gets blocked by that guard — but the attacker's own `receive()` catches its
+    ///      nested call's failure and returns normally, so from `_payout`'s point of view the
+    ///      push itself still succeeds. Two things are true at once: the reentrant call was
+    ///      stopped cold, and the honest payout it rode in on was not collateral damage.
+    function test_ReentrancyDuringThePayoutPushIsBlockedButTheHonestPushStillLands() public {
+        ReentrantVictim attacker = new ReentrantVictim(court);
+
+        Index41Base.Scenario memory s = _defaults();
+        s.victimFrom = address(attacker);
+        court.proveSandwich(_claim(s));
+
+        assertTrue(
+            attacker.guardFired(),
+            "the nested call must fail with exactly Index41.Reentrancy(), not silently or for some other reason"
+        );
+        assertEq(address(attacker).balance, 1 ether, "the outer push is unharmed by the blocked reentrancy attempt");
+        assertEq(court.deferredPayout(address(attacker)), 0, "nothing was deferred; the push itself succeeded");
     }
 
     function test_ContractBalanceMatchesOutstandingObligations() public {

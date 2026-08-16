@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {Index41} from "../src/Index41.sol";
-import {Index41Base} from "./helpers/Index41Base.sol";
+import {Index41Base, StubbornVictim} from "./helpers/Index41Base.sol";
 
 /**
  * @title Index41BondTest
@@ -223,6 +223,26 @@ contract Index41BondTest is Index41Base {
         vm.prank(relay2);
         vm.expectRevert(abi.encodeWithSelector(Index41.InsufficientBond.selector, 100 ether, 5 ether));
         court.withdrawBond(100 ether);
+    }
+
+    /// @dev Withdrawal falls back to reverting the whole call, not a deferred credit like the
+    ///      claim payout — a relay pulling its own bond is not the sympathetic case a victim is.
+    function test_WithdrawToARelayThatRejectsEtherReverts() public {
+        StubbornVictim stubbornRelay = new StubbornVictim();
+        vm.deal(address(stubbornRelay), 10 ether);
+
+        vm.prank(address(stubbornRelay));
+        court.postBond{value: 5 ether}();
+
+        vm.prank(address(stubbornRelay));
+        court.requestUnbond();
+        vm.warp(block.timestamp + 3 days);
+
+        vm.prank(address(stubbornRelay));
+        vm.expectRevert(Index41.TransferFailed.selector);
+        court.withdrawBond(1 ether);
+
+        assertEq(court.bondOf(address(stubbornRelay)), 5 ether, "a reverted transfer must not debit the bond");
     }
 
     function test_WithdrawEmitsEvent() public {

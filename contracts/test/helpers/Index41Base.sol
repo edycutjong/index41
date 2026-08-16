@@ -333,3 +333,28 @@ contract GasHungryVictim {
         }
     }
 }
+
+/// @notice A victim whose fallback tries to re-enter the court, to prove the guard blocks it.
+/// @dev The push payout in {Index41-_payout} forwards only `PAYOUT_GAS` (30,000 gas — "enough
+///      for an EOA, not enough to be interesting"), and a raw `.call` swallows a revert from the
+///      callee rather than propagating it. Both facts shape this contract: it does exactly ONE
+///      cold `SSTORE` (everything else is in-memory), because a second one would blow the gas
+///      stipend and make the whole reentrancy attempt vanish into an out-of-gas revert before it
+///      could record anything — which would prove nothing. The single flag it does write
+///      captures the nested call's exact revert data compared, in memory, against the guard's
+///      own selector, so the top-level test can assert precisely what stopped the reentrant call.
+contract ReentrantVictim {
+    Index41 private immutable COURT;
+
+    /// @notice True only if the nested call reverted with exactly `Index41.Reentrancy()`.
+    bool public guardFired;
+
+    constructor(Index41 court_) {
+        COURT = court_;
+    }
+
+    receive() external payable {
+        (bool ok, bytes memory data) = address(COURT).call(abi.encodeWithSignature("withdrawPayout()"));
+        guardFired = !ok && keccak256(data) == keccak256(abi.encodeWithSelector(Index41.Reentrancy.selector));
+    }
+}
