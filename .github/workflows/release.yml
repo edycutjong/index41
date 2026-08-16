@@ -87,13 +87,25 @@ jobs:
         id: v
         run: node scripts/next-version.mjs --github
 
+      # Everything derived from the commit log reaches the shell through `env:`,
+      # never through `${{ }}` inside a `run:` body. `${{ }}` is pasted in as
+      # source text before bash parses the script, so a commit subject
+      # containing a backtick, `$(…)` or an odd number of quotes would be
+      # executed rather than printed — in the one job that holds `contents:
+      # write`. Quoting `"$NOTES"` keeps it data.
       - name: Report
+        env:
+          BUMP: ${{ steps.v.outputs.bump }}
+          TAG: ${{ steps.v.outputs.tag }}
+          SHOULD_RELEASE: ${{ steps.v.outputs.should_release }}
         run: |
-          echo "### Release" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- bump: \`${{ steps.v.outputs.bump }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- next: \`${{ steps.v.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- releasing: \`${{ steps.v.outputs.should_release }}\`" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### Release"
+            echo ""
+            echo "- bump: \`$BUMP\`"
+            echo "- next: \`$TAG\`"
+            echo "- releasing: \`$SHOULD_RELEASE\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Nothing to release
         if: steps.v.outputs.should_release != 'true'
@@ -104,9 +116,12 @@ jobs:
           steps.v.outputs.should_release == 'true' &&
           github.event_name == 'workflow_dispatch' &&
           inputs.dry_run
+        env:
+          TAG: ${{ steps.v.outputs.tag }}
+          NOTES: ${{ steps.v.outputs.notes }}
         run: |
-          echo "DRY RUN — would tag ${{ steps.v.outputs.tag }}"
-          echo "${{ steps.v.outputs.notes }}"
+          echo "DRY RUN — would tag $TAG"
+          printf '%s\n' "$NOTES"
 
       - name: Tag, bump and release
         if: >-

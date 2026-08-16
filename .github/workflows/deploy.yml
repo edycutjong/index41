@@ -44,13 +44,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # `release` SUCCEEDS even when it releases nothing — a docs-only push produces
+  # no releasable commit, the job prints "Nothing to release" and exits green.
+  # `workflow_run.conclusion == 'success'` therefore does NOT mean "a release was
+  # cut", and gating on it alone would ship every green push to production
+  # untagged, contradicting the ordering promised at the top of this file. There
+  # is no way to read another workflow's outputs across `workflow_run`, so the
+  # tag itself is the signal: production ships a commit that carries one.
+  gate:
     runs-on: ubuntu-latest
-    # Only deploy a release that actually succeeded. A failed or cancelled
-    # release must never reach production.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
+    outputs:
+      tagged: ${{ steps.check.outputs.tagged }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # tags, and enough history to describe them
+
+      - name: Is main's tip a tagged release?
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch — deploying whatever main's tip is."
+            echo "tagged=true" >> "$GITHUB_OUTPUT"
+          elif tag=$(git describe --exact-match --tags --match 'v[0-9]*.[0-9]*.[0-9]*' HEAD 2>/dev/null); then
+            echo "main is at $tag — releasing that to production."
+            echo "tagged=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::main's tip carries no v*.*.* tag, so the release workflow cut nothing this run (docs/ci-only commits do not release on their own). Standing down rather than shipping an untagged commit. To deploy anyway: Actions -> deploy -> Run workflow."
+            echo "tagged=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [gate]
+    # Only deploy a release that actually succeeded AND actually produced a tag.
+    # A failed or cancelled release must never reach production.
+    if: needs.gate.outputs.tagged == 'true'
     environment:
       name: production
       url: ${{ steps.deploy.outputs.url }}
