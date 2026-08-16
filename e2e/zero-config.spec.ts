@@ -35,7 +35,15 @@ test('the meta tags carry the real pitch, not a framework default', async ({ pag
   await page.goto('/');
   const description = await page.locator('meta[name="description"]').getAttribute('content');
   expect(description).toMatch(/laterality/i);
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og-image\.png/);
+  // Assert the file the app actually ships. A previous regression pointed og:image at a name that
+  // was not in public/ and the tag still read fine as a string, so matching the name is not enough:
+  // fetch it and require a real image back. That is the failure this test exists to catch.
+  const og = page.locator('meta[property="og:image"]');
+  await expect(og).toHaveAttribute('content', /og-image-v2\.png$/);
+  const ogUrl = await og.getAttribute('content');
+  const res = await page.request.get(ogUrl!);
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toMatch(/^image\//);
 });
 
 test('no stale prerender: two loads both carry a provenance instant', async ({ page }) => {
