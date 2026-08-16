@@ -45,15 +45,30 @@ contract Index41MechanismTest is Index41Base {
 
     /// @dev The three laterality patterns below are what Ethereum mainnet block 25764741
     ///      actually carried. See docs/spike-output.txt.
-    function test_LiveMainnetLateralityDecodesToFourteen() public view {
+    ///
+    ///      IMPORTANT — what this asserts against: `court.VERIFIER()` is `vm.etch`'d to
+    ///      `MockVerifier` in this suite (unit tests run on a bare EVM; the real precompile at
+    ///      0x...0FD2 has no code there), and `MockVerifier.calculateTxIndex` is a from-scratch
+    ///      Solidity reimplementation of the laterality algorithm, not the precompile. These
+    ///      three tests prove the mock decodes these exact mainnet paths to 14/15/16 — they do
+    ///      NOT exercise the real precompile.
+    ///
+    ///      The precompile itself was independently confirmed against these same three paths on
+    ///      CC3 testnet: OrderProbe's live `proveOrder` call returned `[14, 15, 16]` from
+    ///      `INativeQueryVerifier.calculateTxIndex` at the real precompile address, transcript at
+    ///      docs/spike-output.txt section 7 (tx
+    ///      0x42f725dd8c875185b216b6bbda01d37e12f605c4e8dbd832e7649a8abeeedd02), and again in the
+    ///      deployment run at docs/DEPLOYMENT.md (tx
+    ///      0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810).
+    function test_MockDecodesLiveMainnetLateralityToFourteen() public view {
         assertEq(court.txIndexOf(ROOT, pathFromPattern("RLLLRRRR")), 14, "front-run: 0b00001110");
     }
 
-    function test_LiveMainnetLateralityDecodesToFifteen() public view {
+    function test_MockDecodesLiveMainnetLateralityToFifteen() public view {
         assertEq(court.txIndexOf(ROOT, pathFromPattern("LLLLRRRR")), 15, "victim: 0b00001111");
     }
 
-    function test_LiveMainnetLateralityDecodesToSixteen() public view {
+    function test_MockDecodesLiveMainnetLateralityToSixteen() public view {
         assertEq(court.txIndexOf(ROOT, pathFromPattern("RRRRLRRR")), 16, "back-run: 0b00010000");
     }
 
