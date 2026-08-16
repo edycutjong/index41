@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="index41 — three consecutive rows of one Ethereum block, indices 41 42 43, the middle row indexed gold">
+  <!-- index41 mark: three CONSECUTIVE slots of one Ethereum block, carrying their
+       own indices 41 / 42 / 43 in JetBrains Mono 700 outlines (no live text — the
+       numerals are paths, identical in every renderer). Outer rows slate (searcher
+       buy/sell), middle row gold with the index knocked out of a solid cell — the
+       victim, row 42, the instant its position becomes fact. The consecutive run
+       41→42→43 is what no other mark can carry: it is ORDER, not a highlighted
+       list item.
+
+       Polish pass 2 — THE NUMERALS ARE THE MARK. The index cell went 76→124 wide
+       and the numeral scale 0.476→0.789, so cap height is 9.4% of the canvas
+       instead of 5.7%. At the 96px README embed that is a 9.1px numeral (was 5.5px
+       and unreadable), so the mechanism now survives at the size a judge actually
+       sees it, not only on the 300px BUIDL card. The three laterality bits that
+       used to sit in the left margin are GONE: measured 1.80:1 on the plate and
+       literally absent from a true 16px raster — they were paying rent as texture.
+       The merkle/binary language moved to where it can be read: the hero ledger's
+       PATH column (101001 / 101010 / 101011) and the gallery diagram's bit strip.
+       Self-plated for GitHub light AND dark. -->
+  <defs>
+    <linearGradient id="goldRow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--accent, #FFE29A)"/>
+      <stop offset="55%"  stop-color="var(--accent, #FFC53D)"/>
+      <stop offset="100%" stop-color="var(--accent, #E8A200)"/>
+    </linearGradient>
+    <linearGradient id="slateRow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="var(--primary, #587B9E)"/>
+      <stop offset="100%" stop-color="var(--primary, #4A6885)"/>
+    </linearGradient>
+    <filter id="rowGlow" x="-40%" y="-120%" width="180%" height="340%">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+  </defs>
+
+  <!-- plate -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="var(--bg-panel, #0B1220)"/>
+  <rect x="34" y="34" width="444" height="444" rx="94" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="4"/>
+
+  <!-- row 41 — searcher buy (slate, index outlined) -->
+  <g>
+    <rect x="80" y="109" width="124" height="70" rx="14" fill="none" stroke="var(--primary, #587B9E)" stroke-width="8"/>
+    <g transform="translate(101.7,168.2) scale(0.789)" fill="var(--primary-ink, #8FB2D4)">
+      <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M96.8 0L57.5 0L57.5-9.2L73.4-9.2L73.4-52L57.4-40.1L57.4-51.2L71.5-61.3L83.9-61.3L83.9-9.2L96.8-9.2"/>
+    </g>
+    <rect x="222" y="109" width="164" height="70" rx="14" fill="url(#slateRow)"/>
+  </g>
+
+  <!-- row 42 — the victim: index knocked out of a solid gold cell, longest bar (the fact) -->
+  <g>
+    <rect x="80" y="221" width="352" height="70" rx="14" fill="url(#goldRow)" filter="url(#rowGlow)" opacity="0.5"/>
+    <rect x="80" y="221" width="124" height="70" rx="14" fill="url(#goldRow)"/>
+    <g transform="translate(101.7,280.2) scale(0.789)" fill="var(--bg-panel, #0B1220)">
+      <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M95.3 0L57 0L57-10.2L76.2-29.4Q80.2-33.5 82.2-36.8Q84.1-40.2 84.1-43.7Q84.1-48 81.7-50.4Q79.4-52.8 75.3-52.8Q70.9-52.8 68.4-50.2Q65.9-47.6 65.9-43.1L55.4-43.1Q55.4-49 57.9-53.2Q60.4-57.5 64.9-59.8Q69.5-62.2 75.5-62.2Q81.3-62.2 85.6-60Q89.9-57.8 92.2-53.8Q94.6-49.9 94.6-44.4Q94.6-38.8 91.7-33.5Q88.8-28.1 82.4-22L69.6-9.5L95.3-9.5"/>
+    </g>
+    <rect x="222" y="221" width="210" height="70" rx="14" fill="url(#goldRow)"/>
+  </g>
+
+  <!-- row 43 — searcher sell (slate, index outlined) -->
+  <g>
+    <rect x="80" y="333" width="124" height="70" rx="14" fill="none" stroke="var(--primary, #587B9E)" stroke-width="8"/>
+    <g transform="translate(101.7,392.2) scale(0.789)" fill="var(--primary-ink, #8FB2D4)">
+      <path d="M43.3 0L32.8 0L32.8-12.2L5.5-12.2L5.5-27.4L29.1-61.3L40.8-61.3L15.5-24.6L15.5-21.4L32.8-21.4L32.8-35.3L43.3-35.3L43.3 0M75 0.8Q69 0.8 64.6-1.3Q60.2-3.5 57.8-7.5Q55.4-11.4 55.4-16.8L65.9-16.8Q65.9-12.7 68.3-10.4Q70.7-8.1 75.1-8.1Q79.5-8.1 81.8-10.4Q84.2-12.8 84.2-16.8L84.2-21.6Q84.2-25.7 81.8-28Q79.5-30.3 75.1-30.3L68.2-30.3L68.2-39.8L81.7-52.3L58.1-52.3L58.1-61.3L92.4-61.3L92.4-51.8L75.1-36L75.1-39.3Q84.2-39.3 89.5-34.5Q94.8-29.7 94.8-21.6L94.8-16.8Q94.8-11.4 92.3-7.5Q89.9-3.5 85.4-1.3Q81 0.8 75 0.8"/>
+    </g>
+    <rect x="222" y="333" width="164" height="70" rx="14" fill="url(#slateRow)"/>
+  </g>
+</svg>

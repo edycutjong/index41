@@ -1,0 +1,17 @@
+.env
+.env.*
+node_modules/
+__pycache__/
+.next/
+dist/
+coverage/
+.DS_Store
+docs/assets
+
+# node / foundry / scratch
+scratch/
+out/
+cache/
+lib/
+broadcast/
+*.log
