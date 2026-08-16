@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 700" width="1280" height="700" role="img"
+     aria-label="index41 architecture — a real Ethereum mainnet block is re-encoded and re-folded off-chain, its continuity proof chained to a Creditcoin checkpoint, then one Creditcoin transaction verifies three transactions, recovers each ordinal position from merkle-path laterality, asserts front is before victim is before back, derives harm from proven Swap logs, and pays the victim from the relay's bond.">
+  <title>index41 — architecture</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#587B9E"/>
+    </marker>
+    <marker id="arGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#FFC53D"/>
+    </marker>
+  </defs>
+
+  <style>
+    .bg   { fill:#0B1220 }
+    .card { fill:#081019; stroke:rgba(255,255,255,0.09) }
+    .lbl  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#7E90A8; letter-spacing:1.1 }
+    .h    { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-size:16px; font-weight:600; fill:#E6EDF5 }
+    .m    { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#C2D2E3 }
+    .dim  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#7E90A8 }
+    .mute { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-size:12.5px; fill:#8FA1B8 }
+    .gold { fill:#FFC53D }
+    .grn  { fill:#4ADE80 }
+    .num  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; font-weight:700; fill:#0B1220 }
+  </style>
+
+  <rect class="bg" width="1280" height="700"/>
+
+  <!-- ══ title ══ -->
+  <text x="40" y="46" class="h" font-size="20">index41 — position becomes a fact</text>
+  <text x="40" y="70" class="mute">Ordering is carried in no payload. The merkle authentication path <tspan font-style="italic">is</tspan> the position, and Creditcoin will decode it on-chain.</text>
+
+  <!-- ═══════════ 1. ETHEREUM MAINNET ═══════════ -->
+  <rect class="card" x="40" y="98" width="352" height="238" rx="12"/>
+  <text x="60" y="126" class="lbl">1 · ETHEREUM MAINNET · READ ONLY</text>
+  <text x="60" y="152" class="m">block <tspan class="gold" font-weight="700">25,764,741</tspan> · 240 transactions</text>
+  <text x="60" y="172" class="dim">merkle depth 8 · Attestcoin chain key 3</text>
+
+  <rect x="60" y="188" width="312" height="26" rx="6" fill="rgba(88,123,158,0.16)" stroke="#587B9E"/>
+  <text x="72" y="206" class="dim" letter-spacing="0.4">RLLLRRRR</text>
+  <text x="152" y="206" class="m" font-weight="700" fill="#9FC2E0">14</text>
+  <text x="360" y="206" class="dim" text-anchor="end">searcher buy</text>
+
+  <rect x="60" y="220" width="312" height="26" rx="6" fill="rgba(255,197,61,0.15)" stroke="#FFC53D" stroke-width="1.3"/>
+  <text x="72" y="238" class="dim" letter-spacing="0.4" fill="#8FA1B8">LLLLRRRR</text>
+  <rect x="146" y="224" width="26" height="18" rx="4" fill="#FFC53D"/>
+  <text x="159" y="238" class="num" text-anchor="middle">15</text>
+  <text x="360" y="238" class="dim" text-anchor="end" fill="#FFD98A">the victim</text>
+
+  <rect x="60" y="252" width="312" height="26" rx="6" fill="rgba(88,123,158,0.16)" stroke="#587B9E"/>
+  <text x="72" y="270" class="dim" letter-spacing="0.4">RRRRLRRR</text>
+  <text x="152" y="270" class="m" font-weight="700" fill="#9FC2E0">16</text>
+  <text x="360" y="270" class="dim" text-anchor="end">searcher sell</text>
+
+  <text x="60" y="298" class="dim">the other 237 are never touched</text>
+  <text x="60" y="320" class="dim" fill="#5B6B80">Creditcoin cannot write back to Ethereum.</text>
+
+  <!-- ═══════════ 2. OFF-CHAIN PROVING ═══════════ -->
+  <rect class="card" x="464" y="98" width="352" height="238" rx="12"/>
+  <text x="484" y="126" class="lbl">2 · OFF-CHAIN · BEFORE ANY GAS</text>
+  <text x="484" y="152" class="mute" font-size="12">The prover gets no benefit of the doubt.</text>
+  <g class="m">
+    <text x="484" y="180">· re-encode each leaf from mainnet</text>
+    <text x="484" y="202">· re-fold leaf → root, byte for byte</text>
+    <text x="484" y="224">· chain 60 continuity roots down to a</text>
+    <text x="500" y="244">checkpoint Creditcoin already holds</text>
+    <text x="484" y="266">· dry-run all three legs to true</text>
+  </g>
+  <text x="484" y="296" class="dim">three interchangeable proof sources</text>
+  <text x="484" y="316" class="dim" fill="#5B6B80">hosted · SDK batch · local raw builder</text>
+
+  <!-- ═══════════ 3. CREDITCOIN CC3 ═══════════ -->
+  <rect class="card" x="888" y="98" width="352" height="238" rx="12"/>
+  <text x="908" y="126" class="lbl">3 · CREDITCOIN CC3 · 102031</text>
+  <text x="908" y="152" class="m"><tspan class="gold" font-weight="700">Index41.proveSandwich</tspan></text>
+  <text x="908" y="176" class="dim">a relay's CTC bond stands behind</text>
+  <text x="908" y="194" class="dim">"you will not be sandwiched"</text>
+
+  <rect x="908" y="212" width="312" height="1" fill="rgba(255,255,255,0.09)"/>
+  <text x="908" y="238" class="dim">INativeQueryVerifier — exactly two</text>
+  <text x="908" y="256" class="dim">functions exist, and both are used:</text>
+  <text x="908" y="282" class="m" fill="#9FC2E0">verifyAndEmit</text>
+  <text x="1220" y="282" class="dim" text-anchor="end">proves history</text>
+  <text x="908" y="304" class="m" fill="#9FC2E0">calculateTxIndex</text>
+  <text x="1220" y="304" class="dim" text-anchor="end">free view</text>
+
+  <!-- flow arrows -->
+  <line x1="398" y1="217" x2="456" y2="217" stroke="#587B9E" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="822" y1="217" x2="880" y2="217" stroke="#587B9E" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="427" y="207" class="dim" text-anchor="middle" font-size="10">3 proofs</text>
+  <text x="851" y="207" class="dim" text-anchor="middle" font-size="10">1 tx</text>
+
+  <!-- ═══════════ INSIDE ONE TRANSACTION ═══════════ -->
+  <rect class="card" x="40" y="374" width="1200" height="222" rx="12"/>
+  <text x="60" y="402" class="lbl">INSIDE ONE CREDITCOIN TRANSACTION — CONTRACT CONTROL FLOW</text>
+
+  <g>
+    <!-- step 1 -->
+    <rect x="60" y="418" width="222" height="98" rx="9" fill="rgba(88,123,158,0.10)" stroke="rgba(88,123,158,0.45)"/>
+    <text x="76" y="440" class="dim">STEP 1</text>
+    <text x="76" y="462" class="m" fill="#9FC2E0">3× verifyAndEmit</text>
+    <text x="76" y="484" class="dim">one shared continuity proof</text>
+    <text x="76" y="502" class="dim" fill="#5B6B80">→ TransactionVerified ×3</text>
+
+    <!-- step 2 -->
+    <rect x="300" y="418" width="222" height="98" rx="9" fill="rgba(255,197,61,0.10)" stroke="rgba(255,197,61,0.55)"/>
+    <text x="316" y="440" class="dim" fill="#FFD98A">STEP 2 · THE MECHANISM</text>
+    <text x="316" y="462" class="m gold">3× calculateTxIndex</text>
+    <text x="316" y="484" class="dim">position out of left/right</text>
+    <text x="316" y="502" class="dim">laterality — costs nothing</text>
+
+    <!-- step 3 -->
+    <rect x="540" y="418" width="222" height="98" rx="9" fill="rgba(88,123,158,0.10)" stroke="rgba(88,123,158,0.45)"/>
+    <text x="556" y="440" class="dim">STEP 3</text>
+    <text x="556" y="462" class="m" fill="#9FC2E0">assert the shape</text>
+    <text x="556" y="484" class="m gold" font-size="13" font-weight="700">14 &lt; 15 &lt; 16 ✓</text>
+    <text x="556" y="502" class="dim" fill="#5B6B80">same pool · same searcher</text>
+
+    <!-- step 4 -->
+    <rect x="780" y="418" width="222" height="98" rx="9" fill="rgba(88,123,158,0.10)" stroke="rgba(88,123,158,0.45)"/>
+    <text x="796" y="440" class="dim">STEP 4</text>
+    <text x="796" y="462" class="m" fill="#9FC2E0">EvmV1Decoder</text>
+    <text x="796" y="484" class="dim">proven Swap logs →</text>
+    <text x="796" y="502" class="dim">attacker's realized profit</text>
+
+    <!-- step 5 -->
+    <rect x="1020" y="418" width="200" height="98" rx="9" fill="rgba(74,222,128,0.10)" stroke="rgba(74,222,128,0.5)"/>
+    <text x="1036" y="440" class="dim" fill="#86EFAC">STEP 5</text>
+    <text x="1036" y="462" class="m grn">pay the victim</text>
+    <text x="1036" y="484" class="dim">from the relay's bond</text>
+    <text x="1036" y="502" class="dim" fill="#5B6B80">claim id burned</text>
+
+    <line x1="286" y1="467" x2="296" y2="467" stroke="#FFC53D" stroke-width="1.6" marker-end="url(#arGold)"/>
+    <line x1="526" y1="467" x2="536" y2="467" stroke="#587B9E" stroke-width="1.6" marker-end="url(#ar)"/>
+    <line x1="766" y1="467" x2="776" y2="467" stroke="#587B9E" stroke-width="1.6" marker-end="url(#ar)"/>
+    <line x1="1006" y1="467" x2="1016" y2="467" stroke="#587B9E" stroke-width="1.6" marker-end="url(#ar)"/>
+  </g>
+
+  <line x1="60" y1="538" x2="1220" y2="538" stroke="rgba(255,255,255,0.09)"/>
+  <text x="60" y="566" class="m">emits <tspan class="gold" font-weight="700">SandwichProven</tspan> · <tspan class="grn" font-weight="700">HarmPaid 219,708 wei</tspan> — paid == computed</text>
+  <text x="1220" y="566" class="dim" text-anchor="end">1,092,100 gas · 1.456% of the 75,000,000 MAX_GAS_CAP · status 1 · 5 logs</text>
+
+  <!-- ═══════════ boundary ═══════════ -->
+  <text x="40" y="638" class="lbl">THE BOUNDARY</text>
+  <text x="40" y="664" class="mute">Attestcoin commits transaction <tspan font-weight="600" fill="#E6EDF5">history</tspan>, not <tspan font-weight="600" fill="#E6EDF5">state</tspan>. There is no proof over eth_call, a storage slot or balanceOf — so harm is the</text>
+  <text x="40" y="684" class="mute">attacker's realized profit read from logs that are inside the proof, never a counterfactual against a pre-sandwich reserve ratio.</text>
+</svg>

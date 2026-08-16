@@ -113,6 +113,8 @@ Disclosed rather than discovered:
 | | |
 |---|---|
 | The full argument | [`README.md`](README.md) |
+| The same thing in five screenshots, if you would rather look than run | [`DEMO.md`](DEMO.md) |
+| The architecture on one page | [`docs/architecture.svg`](docs/architecture.svg) |
 | How the proof is built and audited | [`docs/PIPELINE.md`](docs/PIPELINE.md) |
 | Every deploy, bond and balance | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
 | The ruling transcript | [`docs/pipeline-output.txt`](docs/pipeline-output.txt) |
