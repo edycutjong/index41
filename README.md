@@ -152,22 +152,37 @@ surface is **3 methods on 2 classes** (`ProofBuilder` ctor → `waitUntilHeightA
 plus `getLatestAttestedHeightAndHash`). That is the field's baseline.
 
 > **index41 makes 36 distinct Attestcoin surfaces load-bearing, 24 of them undocumented.
-> 31 of the 36 execute on a clean default run (`npm run prove`, zero flags); all 36 execute across
-> the default and `--kill-hosted` runs.**
+> On a clean default run (`npm run prove`, zero flags) 30 of them do real work — 33 if you also
+> count the standby proof sources being constructed. All 36 execute across the default and
+> `--kill-hosted` runs.**
 
-The unqualified number is **31**, not 36. The five that do not run on the default path sit on the
-lower rungs of the proof ladder: they are constructed on every run and *invoked* only when the
-hosted proof sources are gone, which is precisely what `--kill-hosted` forces. Both runs produce the
-same merkle root and the same ruling — transcripts in
+**The number to hold us to is 30, not 36**, and the gap is worth spelling out rather than hiding,
+because it is exactly the kind of thing a surface count is normally used to smuggle past a reader.
+The proof layer is a three-rung ladder. On a default run rung 1 answers in 619 ms, so rungs 2 and 3
+are *built* but never asked a question. That splits the 36 three ways, and every line of it is
+checkable against the committed transcript
+[`docs/pipeline-output.txt`](docs/pipeline-output.txt):
+
+| On a zero-flag `npm run prove` | Count | Which |
+|---|---:|---|
+| Surfaces that do real work | **30** | everything not listed below |
+| Constructed, never queried — the standby rungs | 3 | `service.ProofBuilder`, `raw.RawProofBuilder`, `SimpleBlockProvider` (ctor) |
+| Not reached at all — the standby rungs' working calls | 3 | `ProofBuilder.getBatchProof`, `RawProofBuilder.getProof`, the implemented `BlockProvider` |
+| **Total, across default + `--kill-hosted`** | **36** | `--kill-hosted` removes the hosted sources, so rungs 2 and 3 answer |
+
+So the honest headline is **30 on the default path, 36 across both runs — never 36 unqualified.**
+Both runs produce the same merkle root and the same ruling; transcripts in
 [`docs/pipeline-output.txt`](docs/pipeline-output.txt) and
 [`docs/pipeline-output-local-prover.txt`](docs/pipeline-output-local-prover.txt). "Undocumented"
 means **absent from docs.creditcoin.org**, not "hard to find".
 
-*Reconciliation:* every surface below that the project's 325-surface capability ledger catalogues
-carries the **same** documented / undocumented verdict in both documents — all 32 SDK and on-chain
-rows agree, row for row. The four proof-gen HTTP endpoints fall outside that ledger's SDK scope and
-are classified here against the prover's own published OpenAPI spec and the docs site. The totals
-therefore agree at **36 surfaces / 24 undocumented**, and
+*Reconciliation, re-run for this document:* every surface below that the project's 325-surface
+capability ledger catalogues was checked against it row by row — **32 of 32 rows agree, zero
+disagreements, zero symbols missing from the ledger**. The ledger is authoritative and the table
+below carries its verdicts, not a second opinion. The four proof-gen HTTP endpoints fall outside
+that ledger's SDK scope and are classified against the prover's own published OpenAPI spec and the
+docs site (2 documented, 2 not). The totals therefore land at **36 surfaces / 24 undocumented /
+12 documented**, and
 [`docs/PIPELINE.md`](docs/PIPELINE.md#attestcoin-surfaces-this-pipeline-makes-load-bearing) states
 the identical numbers.
 
@@ -187,12 +202,12 @@ the identical numbers.
 | 10 | `PrecompileBlockProver` | `blockProver` | yes | the free preflight, before any gas is committed |
 | 11 | `.verifySingle` | `blockProver` | yes | all three legs dry-run to `true` before a claim is built |
 | 12 | `.computeTransactionIndex` | `blockProver` | **no** | position recovered off-chain, cross-checked against the contract's answer |
-| 13 | `service.ProofBuilder` | `proofProvider` | yes | proof-ladder rung 2 |
-| 14 | `service.ProofBuilder.getBatchProof` | `proofProvider` | yes | proof-ladder rung 2 — the SDK's own untouched batch call |
-| 15 | `raw.RawProofBuilder` | `proofProvider` | yes | proof-ladder rung 3 — the prover-free path |
-| 16 | `raw.RawProofBuilder.getProof` | `proofProvider` | **no** | the call that actually works for a single-block batch (`getBatchProof` cannot express one) |
-| 17 | `raw.blockProvider.SimpleBlockProvider` (ctor) | `proofProvider` | **no** | `new SimpleBlockProvider(rpc)`, wrapped by this repo's `CachingBlockProvider` |
-| 18 | `raw.blockProvider.BlockProvider` | `proofProvider` | **no** | **implemented**, not just called — 925 mainnet round-trips avoided per local run |
+| 13 | `service.ProofBuilder` | `proofProvider` | yes | proof-ladder rung 2 † |
+| 14 | `service.ProofBuilder.getBatchProof` | `proofProvider` | yes | proof-ladder rung 2 — the SDK's own untouched batch call ‡ |
+| 15 | `raw.RawProofBuilder` | `proofProvider` | yes | proof-ladder rung 3 — the prover-free path † |
+| 16 | `raw.RawProofBuilder.getProof` | `proofProvider` | **no** | the call that actually works for a single-block batch (`getBatchProof` cannot express one) ‡ |
+| 17 | `raw.blockProvider.SimpleBlockProvider` (ctor) | `proofProvider` | **no** | `new SimpleBlockProvider(rpc)`, wrapped by this repo's `CachingBlockProvider` † |
+| 18 | `raw.blockProvider.BlockProvider` | `proofProvider` | **no** | **implemented**, not just called — 925 mainnet round-trips avoided per local run ‡ |
 | 19 | `merkle.hashLeaf` | `proofProvider` | **no** | the leaf hash for the independent merkle walk in `src/audit.ts` |
 | 20 | `merkle.hashInner` | `proofProvider` | **no** | the walk itself — leaf → root, one bit of laterality per sibling |
 | 21 | `merkle.computeDigestOf` | `proofProvider` | **no** | folds the continuity digest chain that lands on Creditcoin's checkpoint |
@@ -212,8 +227,12 @@ the identical numbers.
 | 35 | `INativeQueryVerifier.calculateTxIndex` | on-chain | **no** | **the product** — ordinal position, from merkle laterality |
 | 36 | `EvmV1Decoder` (deployed library, 9 public selectors) | on-chain | yes | linked into `Index41` on chain; also called off-chain by the preflight |
 
-**36 rows · 12 documented · 24 undocumented.** Per-surface reasoning, measurements and the
-deliberate exclusions: [`docs/PIPELINE.md`](docs/PIPELINE.md#attestcoin-surfaces-this-pipeline-makes-load-bearing).
+**36 rows · 12 documented · 24 undocumented · 30 doing real work on a zero-flag default run.**
+† constructed on a default run but never queried — the hosted rung answers first.
+‡ not reached on a default run at all; `--kill-hosted` is what forces them.
+The other 30 rows execute on every run, no flags.
+
+Per-surface reasoning, measurements and the deliberate exclusions: [`docs/PIPELINE.md`](docs/PIPELINE.md#attestcoin-surfaces-this-pipeline-makes-load-bearing).
 
 ### Why only Attestcoin — the SDK is the engine, not decoration
 
@@ -303,6 +322,26 @@ source-verified, so Blockscout decodes the calls and events itself.
 | Gas | `1,092,100` — **1.456%** of `MAX_GAS_CAP` (75,000,000) for 3× `verifyAndEmit` + 3× `calculateTxIndex` + the ordering assert + the events |
 | Day-one spike | `OrderProbe.proveOrder` returned `[14, 15, 16]` live from the real precompile — 292,376 gas, **0.390%** of the cap ([`docs/spike-output.txt`](docs/spike-output.txt)) |
 | Contract tests | **120** Foundry unit tests, 4 suites, **0 failed** |
+
+**Reproduce the whole packet in one command — no key, no `.env`, no wallet:**
+
+```bash
+npm install && npm run capture:check
+```
+
+It re-reads the CC3 receipt, Ethereum mainnet block `25764741` and the prover live, re-derives the
+three positions, and diffs the result against the artifact committed in this repository:
+
+```
+CC3     receipt  block 5317821 · status 1 · 5 logs
+ETH     block 25764741 · 240 transactions
+PROVER  proof-batch answered in 1216ms · cached=false
+        mainnet agrees: 0xec3777f9d0… is at position 14
+        mainnet agrees: 0x7b054188f7… is at position 15
+        mainnet agrees: 0xb0cae362c6… is at position 16
+
+--check: committed artifact MATCHES a fresh live capture
+```
 
 Deploy tx, bond tx, before/after balances and every explorer link — including the three real mainnet
 transactions the ruling is over: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). How the proof is built,

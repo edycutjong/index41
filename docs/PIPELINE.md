@@ -158,20 +158,30 @@ heuristic when that happens.
 The official-example baseline is **3 methods on 2 classes** (`ProofBuilder` ctor →
 `waitUntilHeightAttested` → `getProof`, plus `getLatestAttestedHeightAndHash`).
 
-**36 distinct surfaces, 24 of them undocumented.** 31 execute on a clean default run; all 36 across
-the default and `--kill-hosted` runs. "Undocumented" means absent from docs.creditcoin.org.
+**36 distinct surfaces, 24 of them undocumented.** On a clean default run **30 do real work**; all 36
+across the default and `--kill-hosted` runs. "Undocumented" means absent from docs.creditcoin.org.
 
-The five that do not run on a zero-flag default run sit on the lower rungs of the proof ladder: they
-are constructed on every run and *invoked* only when the hosted sources are gone, which is what
-`--kill-hosted` forces. The honest headline is therefore **31 on the default path, 36 across both
-runs** — never 36 unqualified.
+The gap is the proof ladder. On a default run rung 1 answers in 619 ms, so rungs 2 and 3 are built
+but never asked a question. Checkable line by line against `pipeline-output.txt`:
+
+| On a zero-flag `npm run prove` | Count | Which |
+|---|---:|---|
+| Surfaces that do real work | **30** | everything not listed below |
+| Constructed, never queried — the standby rungs | 3 | `service.ProofBuilder`, `raw.RawProofBuilder`, `SimpleBlockProvider` (ctor) |
+| Not reached at all — the standby rungs' working calls | 3 | `ProofBuilder.getBatchProof`, `RawProofBuilder.getProof`, the implemented `BlockProvider` |
+| **Total, across default + `--kill-hosted`** | **36** | `--kill-hosted` removes the hosted sources, so rungs 2 and 3 answer |
+
+The honest headline is therefore **30 on the default path, 36 across both runs** — never 36
+unqualified.
 
 Every row below whose symbol the project's 325-surface capability ledger catalogues carries the same
-documented/undocumented verdict there — all 32 SDK and on-chain rows agree, row for row. The four
-proof-gen HTTP endpoints fall outside that ledger's SDK scope and are classified here against the
-prover's own published OpenAPI spec and the docs site; `POST /api/v1/proof-batch/{chain_key}` and the
-`ErrorResponse` fields appear in neither the docs site nor any SDK binding, hence undocumented. The
-totals reconcile at **36 / 24**, and `README.md` states the identical numbers.
+documented/undocumented verdict there — the check was re-run row by row: **32 of 32 SDK and on-chain
+rows agree, zero disagreements, zero symbols missing from the ledger**. The ledger is authoritative
+and these rows carry its verdicts. The four proof-gen HTTP endpoints fall outside that ledger's SDK
+scope and are classified here against the prover's own published OpenAPI spec and the docs site;
+`POST /api/v1/proof-batch/{chain_key}` and the `ErrorResponse` fields appear in neither the docs site
+nor any SDK binding, hence undocumented. The totals reconcile at **36 / 24 / 12 documented**, and
+`README.md` states the identical numbers.
 
 ### `chainInfo`
 
