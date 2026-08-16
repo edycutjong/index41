@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FileCode2 } from 'lucide-react';
+import { FileCode2, Github } from 'lucide-react';
 
 import { Button } from '@/app/_components/ui/button';
 import { REPO_URL, sourceHref, sourceLinkProps } from '@/app/_lib/links';
@@ -72,6 +72,17 @@ export function Header() {
               {REPO_URL ? 'Source' : 'Pipeline doc'}
             </a>
           </Button>
+          {/* The repository root itself. Every other "source" link is a deep link into one file;
+              this is the only one that hands a judge the whole thing. Absent while REPO_URL is
+              empty, because the site never prints a github.com address it cannot guarantee. */}
+          {REPO_URL ? (
+            <Button asChild size="sm" variant="ghost" aria-label="index41 on GitHub">
+              <a href={REPO_URL} target="_blank" rel="noreferrer noopener">
+                <Github className="h-3.5 w-3.5" aria-hidden />
+                <span className="hidden sm:inline">GitHub</span>
+              </a>
+            </Button>
+          ) : null}
           <Button asChild size="sm" variant="indexed">
             <a href="#proof">Watch the proof</a>
           </Button>

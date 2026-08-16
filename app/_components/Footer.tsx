@@ -103,6 +103,8 @@ export function Footer({ view }: { view: ProofView }) {
     {
       heading: 'The build',
       links: [
+        // Only present once the repo is public — the repository root, not a deep link into it.
+        ...(REPO_URL ? [{ label: 'The repository on GitHub', href: REPO_URL, external: true }] : []),
         { label: 'The pipeline, step by step', href: sourceHref('docs/PIPELINE.md') },
         { label: 'Deployment record', href: sourceHref('docs/DEPLOYMENT.md') },
         { label: 'Index41.sol', href: sourceHref('contracts/src/Index41.sol') },
