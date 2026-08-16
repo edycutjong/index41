@@ -51,16 +51,56 @@ export const metadata: Metadata = {
     'DeFi',
   ],
   authors: [{ name: 'index41' }],
+  creator: 'index41',
+  publisher: 'index41',
+  category: 'technology',
+  // phone numbers/addresses are never meaningful here, and iOS Safari otherwise
+  // linkifies transaction hashes and block numbers as telephone numbers
+  formatDetection: { telephone: false, address: false, email: false },
+  ...(siteUrl ? { alternates: { canonical: '/' } } : {}),
   openGraph: {
     type: 'website',
     title,
     description,
     siteName: 'index41',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'index41 — position is a fact' }],
+    locale: 'en_US',
+    ...(siteUrl ? { url: '/' } : {}),
+    images: [
+      {
+        url: '/og-image-v2.png',
+        width: 1200,
+        height: 630,
+        type: 'image/png',
+        alt: 'index41 — Ethereum mainnet block 25,764,741 with the searcher at index 14, the victim at 15 and the searcher again at 16, ruled on by a bonded contract on Creditcoin CC3',
+      },
+    ],
   },
-  twitter: { card: 'summary_large_image', title, description, images: ['/og-image.png'] },
-  icons: { icon: '/icon.svg' },
-  robots: { index: true, follow: true },
+  twitter: {
+    card: 'summary_large_image',
+    title,
+    description,
+    images: ['/og-image-v2.png'],
+  },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: ['/icon-32.png'],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'index41',
+    statusBarStyle: 'black-translucent',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
 };
 
 export const viewport: Viewport = {
