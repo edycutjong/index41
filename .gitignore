@@ -12,6 +12,5 @@ docs/assets
 scratch/
 /out/
 /cache/
-/lib/
 /broadcast/
 *.log

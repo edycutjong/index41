@@ -4,13 +4,20 @@
   "private": true,
   "description": "Proves transaction A executed before transaction B inside an Ethereum block, on Creditcoin, via Attestcoin merkle-path laterality.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "test": "forge test --summary",
+    "test:verbose": "forge test --summary -vvv",
+    "test:gas": "forge test --gas-report",
+    "build:contracts": "forge build",
     "spike": "tsx scripts/spike.ts",
     "find-sandwich": "tsx scripts/find-sandwich.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@gluwa/usc-contracts": "^0.1.2",
     "@gluwa/usc-sdk": "0.18.0"
   },
   "devDependencies": {
