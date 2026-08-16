@@ -12,6 +12,10 @@ and a number there ever disagree, the page is right — it read the chain; this 
 
 ## The 30-second path
 
+> **In a hurry, or the host is not answering?** The 2:55 demo walks the whole thing end to end:
+> **https://youtu.be/NuyoosaD-lk**. Nothing in it is staged — the hero beat is a production build
+> reading the ruling live off a public CC3 node, with the `LIVE CHAIN READ` banner on camera.
+
 1. Open the demo surface — **https://index41.edycu.dev** — or run it yourself with
    `npm install && npm run dev` → `http://localhost:3000`. Scroll to the ledger. Three rows of a real Ethereum mainnet block light up in sequence.
 2. Read the banner above the ledger. It names which of the **two real sources** is on screen right
