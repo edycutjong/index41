@@ -16,8 +16,9 @@ import {USCBase} from "./base/USCBase.sol";
  *         position inside that block**, asserts the sandwich shape, computes the attacker's
  *         realized profit from the proven logs, and pays the victim out of the bond.
  *
- *         120 unit tests cover it — `npm test` prints the per-suite table:
- *         Index41MechanismTest 19 · Index41BondTest 26 · Index41ClaimTest 52 · Index41HarmTest 23.
+ *         144 unit tests cover it — `npm test` prints the per-suite table:
+ *         Index41MechanismTest 19 · Index41BondTest 27 · Index41ClaimTest 53 · Index41HarmTest 24 ·
+ *         OrderProbeTest 17 · USCBaseExecuteTest 4.
  *
  * @dev THE ONE THING NOTHING ELSE CAN DO
  *

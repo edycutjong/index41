@@ -1,6 +1,6 @@
 <div align="center">
   <img src="docs/assets/icon-animated.svg" alt="index41 icon" width="144">
-  <h1>index41 ⚖️</h1>
+  <h1>index41 🥪</h1>
   <p><em>Proves transaction A executed <b>before</b> transaction B inside an Ethereum block — a fact carried in no payload and readable by no oracle — and makes a relay's bond pay for breaking its no-sandwich promise.</em></p>
   <img src="docs/assets/readme-hero-animated.svg" alt="index41 — three slate transactions lock into gold indices the instant merkle laterality decodes: position becomes fact" width="100%">
 
@@ -11,7 +11,7 @@
     — status <code>1</code>, 1,092,100 gas, <b>1.456%</b> of <code>MAX_GAS_CAP</code>. The positions are
     not hardcoded in the page's code path: they are decoded, on every page load, from the
     logs the Attestcoin precompile itself wrote (a committed capture of that same read backs the
-    page when a live one is unreachable — see below). <b>120 Foundry tests, 0 failed.</b>
+    page when a live one is unreachable — see below). <b>144 Foundry tests, 0 failed.</b>
   </p>
 
   <br/>
@@ -27,7 +27,7 @@
   <br/>
 
   ![Solidity](https://img.shields.io/badge/Solidity-0.8-363636?style=flat&logo=solidity)
-  ![Foundry](https://img.shields.io/badge/Foundry-120_tests-ef4444?style=flat)
+  ![Foundry](https://img.shields.io/badge/Foundry-144_tests-ef4444?style=flat)
   ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
   ![Next.js](https://img.shields.io/badge/Next.js_16-black?style=flat&logo=next.js)
   ![Creditcoin](https://img.shields.io/badge/Creditcoin-CC3_testnet_102031-1a1a2e?style=flat)
@@ -149,7 +149,7 @@ checkpoint Creditcoin already holds — **before a single unit of gas is spent**
 | Court | Solidity 0.8, contract extending `USCBase` | the ruling has to happen *inside* contract control flow, not be reported to it |
 | Verification | `INativeQueryVerifier` precompile (`verifyAndEmit`, `calculateTxIndex`) | the only on-chain surface that answers "what position was this?" |
 | Decoding | `EvmV1Decoder` deployed library, linked on chain | `Swap` logs → realized profit, from the same bytes the precompile verified |
-| Tests | Foundry — **120 unit tests**, 4 suites | including a 256-leaf exhaustive round-trip of the decode |
+| Tests | Foundry — **144 unit tests**, 6 suites | including a 256-leaf exhaustive round-trip of the decode |
 | Pipeline | TypeScript + `@gluwa/usc-sdk` 0.18.0, ethers v6 | three interchangeable proof sources behind one interface |
 | Demo | Next.js 16 (App Router), Tailwind, ShadCN | server component reads the ruling off CC3 before first paint |
 | E2E | Playwright — **54 tests**, chromium + Pixel 7 | asserts invariants, never the literal indices |
@@ -353,7 +353,7 @@ source-verified, so Blockscout decodes the calls and events itself.
 | Harm paid from the bond | `219,708` wei → the address the *proof* says was sandwiched. Paid == computed. |
 | Gas | `1,092,100` — **1.456%** of `MAX_GAS_CAP` (75,000,000) for 3× `verifyAndEmit` + 3× `calculateTxIndex` + the ordering assert + the events |
 | Day-one spike | `OrderProbe.proveOrder` returned `[14, 15, 16]` live from the real precompile — 292,376 gas, **0.390%** of the cap ([`docs/spike-output.txt`](docs/spike-output.txt)) |
-| Contract tests | **120** Foundry unit tests, 4 suites, **0 failed** |
+| Contract tests | **144** Foundry unit tests, 6 suites, **0 failed** |
 
 **Reproduce the whole packet in one command — no key, no `.env`, no wallet:**
 
@@ -381,18 +381,20 @@ audited and made prover-independent: [`docs/PIPELINE.md`](docs/PIPELINE.md).
 
 ## 📊 Engineering Rigor
 
-**120 Foundry unit tests, 0 failed:**
+**144 Foundry unit tests, 0 failed:**
 
 ```
 Index41MechanismTest   19   wiring, constants, position recovery from merkle laterality
-Index41BondTest        26   posting/accumulating a bond, declaring coverage, the unbond clock
-Index41ClaimTest       52   the sandwich-shape assertion and every way to fail it
-Index41HarmTest        23   realized-profit accounting, replay protection, double-claim guards
+Index41BondTest        27   posting/accumulating a bond, declaring coverage, the unbond clock
+Index41ClaimTest       53   the sandwich-shape assertion and every way to fail it
+Index41HarmTest        24   realized-profit accounting, replay protection, double-claim guards
+OrderProbeTest         17   the day-one spike contract, end to end
+USCBaseExecuteTest      4   the USC base class's own execute() guards
 ```
 
 | Layer | Tool | Result on this repo |
 |---|---|---|
-| Contracts | Foundry · `forge fmt --check` | **120 tests**, 4 suites, 0 failed · formatter clean |
+| Contracts | Foundry · `forge fmt --check` | **144 tests**, 6 suites, 0 failed · formatter clean |
 | Exhaustive verification | Foundry | **256 positions** — every leaf of the depth-8 tree round-tripped |
 | Latency | `npm run bench` — p50/p95 over repeated real runs | three paths, correctness-gated · [`DEMO.md`](DEMO.md#full-results) |
 | Deployed-code identity | `node scripts/verify-bytecode.mjs` | every court runs byte-identical executable code |
@@ -479,7 +481,7 @@ at [`docs/pipeline-output-replay.txt`](docs/pipeline-output-replay.txt).
 ```bash
 npm ci
 forge build                    # default profile — unit tests link their own EvmV1Decoder
-npm test                       # forge test --summary — 120 tests, all four suites
+npm test                       # forge test --summary — 144 tests, all six suites
 npm run test:gas               # per-test gas report
 
 npm run build && npm run e2e   # Playwright — 54 tests, chromium + mobile, zero config
@@ -488,7 +490,7 @@ npm run typecheck              # tsc --noEmit
 npm run lighthouse             # Lighthouse CI over / and /judge
 npm run secrets                # gitleaks over the full git history AND the working tree
 
-npm run ci                     # ESLint + tsc + forge fmt --check + 120 forge tests + npm audit
+npm run ci                     # ESLint + tsc + forge fmt --check + 144 forge tests + npm audit
 npm run ci:full                # …plus the Next production build and the 54-test Playwright suite
 make security-scan             # the above, plus npm audit and a licence check
 ```
@@ -502,7 +504,7 @@ contracts/src/
                            3× verifyAndEmit fit in one tx under MAX_GAS_CAP — before any product code
   interfaces/INativeQueryVerifier.sol   the precompile interface, exactly as Creditcoin ships it
   base/USCBase.sol        shared USC-SDK plumbing (kept unmodified from the vendored source)
-contracts/test/           120 Foundry unit tests, 4 suites
+contracts/test/           144 Foundry unit tests, 6 suites
 
 src/                      the TypeScript proving pipeline (npm run prove)
   prove.ts                entrypoint — resolve block, wait for attestation, fetch, audit, decode,
@@ -568,7 +570,7 @@ Disclosed rather than discovered.
   measurement against `MAX_GAS_CAP` was a day-3 go/no-go gate rather than a footnote.
 - **It does not detect sandwiches on chain.** The caller supplies three transaction hashes and the
   contract rules on them.
-- **Three of the 120 unit tests prove the mock, not the precompile** — and are named accordingly.
+- **Three of the 144 unit tests prove the mock, not the precompile** — and are named accordingly.
   Unit tests run on a bare EVM where the precompile address holds no code. The real precompile was
   confirmed live on CC3, separately.
 - **One bonded relay, one ruling, testnet, unaudited.** The deployed contract has ruled once, on the

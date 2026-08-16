@@ -9,13 +9,14 @@
 import { ArrowDown, ExternalLink } from 'lucide-react';
 
 import { Badge } from '@/app/_components/ui/badge';
+import { RepoBadges } from '@/app/_components/RepoBadges';
 import { Button } from '@/app/_components/ui/button';
 import { explorerAddress } from '@/app/_lib/chain';
 import { sourceHref, sourceLinkProps } from '@/app/_lib/links';
 import type { ProofView } from '@/app/_lib/proof';
 import { groupDigits, shortHash } from '@/app/_lib/utils';
 
-export function Hero({ view }: { view: ProofView }) {
+export async function Hero({ view }: { view: ProofView }) {
   const stats = [
     {
       figure: `${view.ruling.frontIndex} · ${view.ruling.victimIndex} · ${view.ruling.backIndex}`,
@@ -33,7 +34,7 @@ export function Hero({ view }: { view: ProofView }) {
       note: `one block, ${view.source.transactionCount} transactions`,
     },
     {
-      figure: '120',
+      figure: '144',
       label: 'Foundry tests, all passing',
       note: 'npm test — forge test --summary',
     },
@@ -55,6 +56,9 @@ export function Hero({ view }: { view: ProofView }) {
               <Badge tone="indexed">Creditcoin CC3 · live</Badge>
               <Badge tone="claimed">Attestcoin native query verifier</Badge>
               <Badge tone="quiet">DeFi</Badge>
+              {/* Real release + CI state, read from the GitHub API on the server. Renders nothing
+                  if either read fails — see _lib/repo.ts. */}
+              <RepoBadges />
             </div>
 
             <h1 className="text-balance text-[clamp(2.6rem,7.2vw,5.1rem)] font-bold leading-[0.94] tracking-[-0.035em]">
