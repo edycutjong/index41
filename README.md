@@ -18,7 +18,7 @@
 
   [![Live demo](https://img.shields.io/badge/▶️_Live_demo-index41-0ea5e9?style=for-the-badge)](https://index41.edycu.dev)
   [![Judge in 30 seconds](https://img.shields.io/badge/⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
-  [![Pitch deck](https://img.shields.io/badge/📊_Pitch_deck-10_pages_PDF-e11d48?style=for-the-badge)](docs/index41-pitch-deck.pdf)
+  [![Pitch deck](https://img.shields.io/badge/📊_Pitch_deck-10_pages_PDF-e11d48?style=for-the-badge)](public/index41-pitch-deck.pdf)
   <!-- Demo video: points at DEMO.md until the recording is uploaded. When the YouTube URL exists,
        swap the href below for it (https://www.youtube.com/watch?v=…) and update, in this order:
        submission/links.md → submission/submission-text.md → the deck → the video end card →

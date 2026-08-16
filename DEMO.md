@@ -219,4 +219,4 @@ npm run capture:check               # re-read every live source, diff the commit
 | How the proof is built and audited | [`docs/PIPELINE.md`](docs/PIPELINE.md) |
 | Every deploy, bond and balance | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
 | The ruling transcript, and the same run with no proof service | [`docs/pipeline-output.txt`](docs/pipeline-output.txt) · [`docs/pipeline-output-local-prover.txt`](docs/pipeline-output-local-prover.txt) |
-| Pitch deck (PDF) | [`docs/index41-pitch-deck.pdf`](docs/index41-pitch-deck.pdf) |
+| Pitch deck (PDF) | [`public/index41-pitch-deck.pdf`](public/index41-pitch-deck.pdf) — served at `/index41-pitch-deck.pdf` |
