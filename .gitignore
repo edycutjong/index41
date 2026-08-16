@@ -21,3 +21,7 @@ scratch/
 /.next/
 /next-env.d.ts
 *.tsbuildinfo
+
+# Next 16 can regenerate these; this repo is public and they do not belong in it
+/AGENTS.md
+/CLAUDE.md
