@@ -353,7 +353,10 @@ async function main() {
   try {
     const estimate = await proveOrder.estimateGas(...args);
     gasLimit = (estimate * 12n) / 10n;
-    log(`estimateGas    ${estimate}  (${utils.gas.gasAsPercentageOfMax(estimate).toFixed(2)}% of MAX_GAS_CAP)`);
+    // Full-precision percentage, not utils.gas.gasAsPercentageOfMax: that helper does integer
+    // basis-point division and truncates (e.g. it prints 0.38% where the exact figure is 0.390%).
+    const exactPct = (Number(estimate) / Number(utils.gas.MAX_GAS_CAP)) * 100;
+    log(`estimateGas    ${estimate}  (${exactPct.toFixed(3)}% of MAX_GAS_CAP)`);
   } catch (err) {
     // pallet-evm does not propagate precompile revert reasons during estimation
     log(`estimateGas    FAILED (${(err as Error).message.split('\n')[0]}) — falling back to SDK computeGasLimit`);
@@ -373,7 +376,8 @@ async function main() {
   const receipt = await tx.wait();
 
   const used = receipt!.gasUsed;
-  const pct = utils.gas.gasAsPercentageOfMax(used);
+  // Full-precision, not the truncating SDK helper — see the comment above.
+  const pct = (Number(used) / Number(utils.gas.MAX_GAS_CAP)) * 100;
   log('');
   log(`CC3 tx hash    ${tx.hash}`);
   log(`block          ${receipt!.blockNumber}   status ${receipt!.status}`);

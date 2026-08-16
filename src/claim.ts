@@ -272,7 +272,22 @@ export interface GasBudget {
   calldataBytes: number;
   computedLimit: bigint;
   cappedLimit: bigint;
+  /** `utils.gas.gasAsPercentageOfMax` — integer basis-point division, truncates below 0.01pt. */
   percentOfCapBefore: number;
+  /** Full-precision `computedLimit / MAX_GAS_CAP`, for display where the truncation matters. */
+  exactPercentOfCapBefore: number;
+}
+
+/**
+ * `computedLimit / MAX_GAS_CAP`, done in floating point rather than the SDK's integer
+ * basis-point division. `utils.gas.gasAsPercentageOfMax` computes `(gas * 10000) / MAX_GAS_CAP`
+ * with integer division and then divides by 100, which truncates: 292,376 gas over a 75,000,000
+ * cap is 0.389835%, but the SDK helper returns 0.38% because `(292376 * 10000) / 75000000 = 38`
+ * (bp) truncates before the percent conversion. The gas figures here are all well inside
+ * `Number`'s exact-integer range, so this is exact, not an approximation.
+ */
+function exactPercentOfMax(gas: bigint): number {
+  return (Number(gas) / Number(utils.gas.MAX_GAS_CAP)) * 100;
 }
 
 /**
@@ -295,6 +310,7 @@ export async function budgetGas(
     computedLimit,
     cappedLimit,
     percentOfCapBefore: utils.gas.gasAsPercentageOfMax(computedLimit),
+    exactPercentOfCapBefore: exactPercentOfMax(computedLimit),
   };
 }
 
@@ -303,7 +319,9 @@ export interface SubmissionResult {
   blockNumber: number;
   status: number;
   gasUsed: bigint;
+  /** `utils.gas.gasAsPercentageOfMax` — truncated, see `exactPercentOfMax` doc comment above. */
   percentOfCap: number;
+  exactPercentOfCap: number;
   /** Positions the PRECOMPILE itself reported, one per `verifyAndEmit`. */
   verifiedIndices: number[];
   events: Array<{ name: string; args: string[] }>;
@@ -343,6 +361,7 @@ export async function submitClaim(
     status: receipt.status ?? 0,
     gasUsed: receipt.gasUsed,
     percentOfCap: utils.gas.gasAsPercentageOfMax(receipt.gasUsed),
+    exactPercentOfCap: exactPercentOfMax(receipt.gasUsed),
     verifiedIndices,
     events,
   };

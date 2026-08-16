@@ -33,7 +33,8 @@ import {USCBase} from "./base/USCBase.sol";
  *         There is no on-chain batch verify, so a three-transaction claim is three sequential
  *         `verifyAndEmit` calls in one Creditcoin transaction. Measured on CC3 testnet:
  *         292,376 gas for three verifications plus three index recoveries plus the ordering
- *         assertion — 0.38% of the 75,000,000 MAX_GAS_CAP.
+ *         assertion — 0.390% of the 75,000,000 MAX_GAS_CAP (292,376 / 75,000,000; the SDK's own
+ *         `utils.gas.gasAsPercentageOfMax` truncates this to 0.38%, see docs/PIPELINE.md).
  *      2. Attestcoin proves transaction HISTORY, not STATE. The merkle root commits
  *         `abiEncode(tx, rx)`. Post-state is never committed. Therefore harm here is the
  *         attacker's *realized profit*, read from logs that are inside the proof — never a

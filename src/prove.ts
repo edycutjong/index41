@@ -413,14 +413,14 @@ async function main() {
   const budget = await budgetGas(cc3, court, calldata, wallet.address, bundle.continuityProof.roots.length);
   log.kv('calldata', `${budget.calldataBytes} bytes (utils.hex.bytesInHexString)`);
   log.kv('gas limit', `${budget.computedLimit} from utils.gas.computeGasLimit`);
-  log.kv('MAX_GAS_CAP', `${utils.gas.MAX_GAS_CAP} — the budget is ${budget.percentOfCapBefore.toFixed(3)}% of it`);
+  log.kv('MAX_GAS_CAP', `${utils.gas.MAX_GAS_CAP} — the budget is ${budget.exactPercentOfCapBefore.toFixed(3)}% of it`);
   log.kv('sending with', `${budget.cappedLimit}`);
 
   const result = await submitClaim(court, wallet, claim, budget.cappedLimit);
   log.line('');
   log.kv('CC3 tx', result.txHash);
   log.kv('block', `${result.blockNumber} · status ${result.status}`);
-  log.kv('GAS USED', `${result.gasUsed}  (${result.percentOfCap.toFixed(3)}% of MAX_GAS_CAP)`);
+  log.kv('GAS USED', `${result.gasUsed}  (${result.exactPercentOfCap.toFixed(3)}% of MAX_GAS_CAP)`);
   assert(result.status === 1, 'proveSandwich reverted');
   assert(result.gasUsed <= utils.gas.MAX_GAS_CAP, `used ${result.gasUsed}, over MAX_GAS_CAP`);
 

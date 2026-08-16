@@ -32,9 +32,9 @@ produces the same merkle root, byte for byte.
 
 | Run | Proof source | Index41 | CC3 transaction | Gas |
 |---|---|---|---|---|
-| **live deployment** — see [`DEPLOYMENT.md`](DEPLOYMENT.md) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) **(source verified)** | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) | 1,092,100 (1.450% of cap) |
-| default | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0x2084C677…82DDD`](https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD) | [`0x53ac43ed…03b8b`](https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b) | 1,092,100 (1.450% of cap) |
-| `--kill-hosted` | `RawProofBuilder` — **no proof service at all** | [`0xc5F604B7…66C33`](https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33) | [`0xb95466d9…16fb2`](https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2) | 1,092,100 (1.450% of cap) |
+| **live deployment** — see [`DEPLOYMENT.md`](DEPLOYMENT.md) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) **(source verified)** | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) | 1,092,100 (1.456% of cap) |
+| default | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0x2084C677…82DDD`](https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD) | [`0x53ac43ed…03b8b`](https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b) | 1,092,100 (1.456% of cap) |
+| `--kill-hosted` | `RawProofBuilder` — **no proof service at all** | [`0xc5F604B7…66C33`](https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33) | [`0xb95466d9…16fb2`](https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2) | 1,092,100 (1.456% of cap) |
 
 Both runs emitted, from the precompile itself:
 
@@ -140,9 +140,14 @@ Printed with every submission, from the SDK's own helpers rather than a local ru
 ```
 calldata        17860 bytes (utils.hex.bytesInHexString)
 gas limit       1539012 from utils.gas.computeGasLimit
-MAX_GAS_CAP     75000000 — the budget is 2.050% of it
-GAS USED        1092100  (1.450% of MAX_GAS_CAP)
+MAX_GAS_CAP     75000000 — the budget is 2.052% of it
+GAS USED        1092100  (1.456% of MAX_GAS_CAP)
 ```
+
+(Exact `gasUsed / MAX_GAS_CAP`, not `utils.gas.gasAsPercentageOfMax` — that SDK helper does integer
+basis-point division and truncates, e.g. it would print `1.45%` here instead of `1.456%`. The
+raw `pipeline-output*.txt` transcripts still show the SDK's truncated figure, because that is
+literally what the script printed at the time the helper was still driving the display.)
 
 `computeGasLimit` matters on Creditcoin specifically: `pallet-evm` does not always propagate
 precompile revert reasons during estimation, and the helper falls back to a continuity-length
@@ -153,7 +158,7 @@ heuristic when that happens.
 The official-example baseline is **3 methods on 2 classes** (`ProofBuilder` ctor →
 `waitUntilHeightAttested` → `getProof`, plus `getLatestAttestedHeightAndHash`).
 
-**36 distinct surfaces, 23 of them undocumented.** 31 execute on a clean default run; all 36 across
+**36 distinct surfaces, 24 of them undocumented.** 31 execute on a clean default run; all 36 across
 the default and `--kill-hosted` runs. "Undocumented" means absent from docs.creditcoin.org.
 
 ### `chainInfo`
@@ -186,7 +191,7 @@ the default and `--kill-hosted` runs. "Undocumented" means absent from docs.cred
 | `service.ProofBuilder.getBatchProof` | 📖 | ladder rung 2 |
 | `raw.RawProofBuilder` | 📖 | ladder rung 3 — the prover-free path |
 | `raw.RawProofBuilder.getProof` | — | the call that actually works for a single-block batch |
-| `raw.blockProvider.SimpleBlockProvider` | 📖 | wrapped by `CachingBlockProvider` |
+| `raw.blockProvider.SimpleBlockProvider.constructor` | — | `new SimpleBlockProvider(rpc)`, wrapped by `CachingBlockProvider` |
 | `raw.blockProvider.BlockProvider` | — | implemented, not just called |
 | `merkle.hashLeaf` | — | leaf hash for the independent merkle walk |
 | `merkle.hashInner` | — | the walk itself |

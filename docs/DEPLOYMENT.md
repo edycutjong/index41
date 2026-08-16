@@ -105,16 +105,24 @@ or a fabricated proof — so it was not done.
 ```
 calldata      17,860 bytes          utils.hex.bytesInHexString
 estimate      1,140,009             eth_estimateGas
-gas limit     1,539,012             utils.gas.computeGasLimit  (2.05% of cap)
-GAS USED      1,092,100             1.45% of MAX_GAS_CAP       (utils.gas.gasAsPercentageOfMax)
+gas limit     1,539,012             utils.gas.computeGasLimit  (2.052% of cap)
+GAS USED      1,092,100             1.456% of MAX_GAS_CAP
 MAX_GAS_CAP   75,000,000            utils.gas.MAX_GAS_CAP
 headroom      73,907,900 gas        68.7× what the claim spent
 ```
 
 Three `verifyAndEmit` calls, three `calculateTxIndex` calls, three full `EvmV1Decoder` decodes, the
 ordering assertion, the harm computation, storage of the verdict and the payout — all inside a
-single Creditcoin transaction using **1.45%** of the block's gas cap. The day-3 gate was that three
-verifications fit under `MAX_GAS_CAP`; they fit with two orders of magnitude to spare.
+single Creditcoin transaction using **1.456%** of the block's gas cap (`1,092,100 / 75,000,000`).
+The day-3 gate was that three verifications fit under `MAX_GAS_CAP`; they fit with two orders of
+magnitude to spare.
+
+> The percentages above are `gasUsed / MAX_GAS_CAP` computed exactly. The SDK's own
+> `utils.gas.gasAsPercentageOfMax` — which the pipeline still calls, because it's a load-bearing
+> surface — does integer basis-point division and truncates: it would print `1.45%` here, not
+> `1.456%`. `docs/pipeline-output*.txt` are raw transcripts and still show the SDK's truncated
+> figure, since that's literally what the script printed at the time; this page states the exact
+> value instead.
 
 ## Every court ever deployed
 
