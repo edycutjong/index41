@@ -1,0 +1,95 @@
+index41 — BENCHMARK
+repeated-run latency for the proving pipeline, p50 / p95, real network and real chain
+run at 2026-08-16T10:09:37.689Z
+node v22.22.0 · darwin/arm64
+
+There is no offline mode and no mock. Every trial below is a real round trip; every
+end-to-end trial lands a real transaction on Creditcoin CC3 testnet.
+
+── Fixture — the same sandwich, every trial ──────────────────────────────────
+data/sandwich-25764741.json · Ethereum mainnet block 25764741
+  front-run  position  14  0xec3777f9d0e55d03b9caa3a4b8a786dd62e16eeb327a9f1c45dfbc79af618436
+  victim     position  15  0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
+  back-run   position  16  0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
+
+trials: hosted 20 · local 5 · end-to-end 5 · 1 warm-up each, discarded
+
+── 1. Hosted proof fetch — POST /api/v1/proof-batch/3 ────────────────────────
+  warm-up  1,192 ms (discarded)
+  trial  1  1,214 ms
+  trial  2  626 ms
+  trial  3  634 ms
+  trial  4  638 ms
+  trial  5  638 ms
+  trial  6  625 ms
+  trial  7  3,395 ms
+  trial  8  644 ms
+  trial  9  636 ms
+  trial 10  702 ms
+  trial 11  637 ms
+  trial 12  631 ms
+  trial 13  622 ms
+  trial 14  625 ms
+  trial 15  681 ms
+  trial 16  665 ms
+  trial 17  632 ms
+  trial 18  705 ms
+  trial 19  675 ms
+  trial 20  655 ms
+
+── 2. Local proof build — RawProofBuilder, cold cache, no proof service ──────
+a fresh CachingBlockProvider per trial, so every trial pays the full mainnet cost
+  warm-up  253,671 ms (discarded)
+  trial  1  171,045 ms
+  trial  2  154,986 ms
+  trial  3  182,232 ms
+  trial  4  386,790 ms
+  trial  5  163,131 ms
+
+── 3. End-to-end prove → ruling — three tx hashes in, one confirmed CC3 ruling out ─
+timed: fetch → audit → decode → free dry-run → claim → submit → receipt
+untimed setup per trial: a fresh court is deployed and bonded, because the replay guard
+retires a court once it has ruled. A relay bonds once; claims then settle against it.
+  warm-up  17,082 ms (discarded) · 0x328f347429bb6c91a2f3e859858c6706543cdc4183b4efe89545a94a801e24a1
+  trial  1  12,795 ms · 1092100 gas · block 5319297 · 0x92359364e1e2565764917b4d1a7c6d0e784d9eb9032b728cb4f8034269727e8c
+  trial  2  17,243 ms · 1092100 gas · block 5319301 · 0xbc0dd6e5de827bcb1e094a3ccbebf5c9b213992ac90158cd7f4150482989de87
+  trial  3  17,129 ms · 1092100 gas · block 5319305 · 0x3c80ae884a99dc5dd087a000f47cc2df04363b21ef683ec27615acdef093e5dc
+  trial  4  12,696 ms · 1092100 gas · block 5319309 · 0x74a706d215c05b2df6f84e3ec193df2dc588d852ab58887f83c272db82a19687
+  trial  5  16,874 ms · 1092100 gas · block 5319313 · 0x7d7e73627c8a22905159351dff2b22d7acf1bc44e70961512801044f3f3594ca
+
+── Results ───────────────────────────────────────────────────────────────────
+| path | n | p50 | p95 | min | max | mean |
+|---|---:|---:|---:|---:|---:|---:|
+| hosted proof fetch | 20 | 638 ms | 1,214 ms | 622 ms | 3,395 ms | 814 ms |
+| local proof build (no prover) | 5 | 171,045 ms | 386,790 ms * | 154,986 ms | 386,790 ms | 211,637 ms |
+| end-to-end prove → ruling | 5 | 16,874 ms | 17,243 ms * | 12,696 ms | 17,243 ms | 15,347 ms |
+
+* nearest-rank p95 at this n IS the slowest observation. Read it as a worst case seen,
+  not as a resolved tail. The n is small on purpose: those trials cost real gas or ~200s
+  of mainnet round-trips each.
+
+The hosted prover is 268× faster at the median — and index41 does not need it: the local path returns the same merkle root, 0x362ca563e40b7cef16c1b901211e74a50abb61657945997a476ae7bc35676c16.
+
+── Real-run receipt — the rulings this benchmark actually landed ─────────────
+signer 0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24
+balance 9992.981569222499340876 CTC → 9986.966915413499340876 CTC
+spent 6.014653809 CTC across 6 courts deployed, 6 bonds posted and 6 rulings submitted
+gas used by the 5 measured rulings: 5460500 (1092100 each)
+
+  https://creditcoin-testnet.blockscout.com/tx/0x92359364e1e2565764917b4d1a7c6d0e784d9eb9032b728cb4f8034269727e8c
+      block 5319297 · 1092100 gas · paid 219708 wei to the victim
+  https://creditcoin-testnet.blockscout.com/tx/0xbc0dd6e5de827bcb1e094a3ccbebf5c9b213992ac90158cd7f4150482989de87
+      block 5319301 · 1092100 gas · paid 219708 wei to the victim
+  https://creditcoin-testnet.blockscout.com/tx/0x3c80ae884a99dc5dd087a000f47cc2df04363b21ef683ec27615acdef093e5dc
+      block 5319305 · 1092100 gas · paid 219708 wei to the victim
+  https://creditcoin-testnet.blockscout.com/tx/0x74a706d215c05b2df6f84e3ec193df2dc588d852ab58887f83c272db82a19687
+      block 5319309 · 1092100 gas · paid 219708 wei to the victim
+  https://creditcoin-testnet.blockscout.com/tx/0x7d7e73627c8a22905159351dff2b22d7acf1bc44e70961512801044f3f3594ca
+      block 5319313 · 1092100 gas · paid 219708 wei to the victim
+
+── Correctness ───────────────────────────────────────────────────────────────
+all trials passed every check: positions 14 / 15 / 16, one merkle root across both
+proof sources, status-1 receipts with three TransactionVerified logs, paid == computed.
+──────────────────────────────────────────────────────────────────────────────
+finished 2026-08-16T10:38:03.224Z · 1706s total
+evidence written to docs/bench-output.txt
