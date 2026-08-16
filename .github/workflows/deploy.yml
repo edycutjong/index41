@@ -59,7 +59,7 @@ jobs:
     outputs:
       tagged: ${{ steps.check.outputs.tagged }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0 # tags, and enough history to describe them
@@ -88,14 +88,14 @@ jobs:
       name: production
       url: ${{ steps.deploy.outputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # workflow_run checks out the default branch tip, which is what we
           # want: it includes the version-bump commit the release just pushed.
           ref: main
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
 

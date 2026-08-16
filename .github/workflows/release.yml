@@ -56,7 +56,7 @@ jobs:
     permissions:
       contents: write # create the tag, push the version bump, cut the release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The bump commit lands on main, so check out the branch rather than
           # the validated SHA — pushing from a detached commit that main has
@@ -79,7 +79,7 @@ jobs:
             echo "stale=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
 
