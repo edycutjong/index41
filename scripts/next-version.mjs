@@ -31,12 +31,14 @@ import { readFileSync, appendFileSync } from 'node:fs';
 
 const sh = (cmd) => execSync(cmd, { encoding: 'utf8' }).trim();
 
-/** Types that justify cutting a release on their own. */
+/**
+ * Types that justify cutting a release on their own. Every other known type
+ * below (docs, ci, test, chore, style, refactor, build, meta, bench, demo) is
+ * real work and gets its own section in the notes, but never independently
+ * triggers a release — it only rides along in the notes of a release one of
+ * these RELEASING commits already triggered.
+ */
 const RELEASING = new Set(['feat', 'fix', 'perf', 'prove', 'deploy']);
-/** Types that are real work but ride along rather than triggering a release. */
-const RIDEALONG = new Set([
-  'docs', 'ci', 'test', 'chore', 'style', 'refactor', 'build', 'meta', 'bench', 'demo',
-]);
 
 const SECTIONS = [
   ['feat', 'Features'],
@@ -98,7 +100,9 @@ function bumpFor(parsed) {
   if (parsed.some((c) => c.breaking)) return 'major';
   if (parsed.some((c) => c.type === 'feat')) return 'minor';
   if (parsed.some((c) => RELEASING.has(c.type))) return 'patch';
-  if (parsed.some((c) => RIDEALONG.has(c.type))) return 'patch';
+  // RIDEALONG types (docs, ci, chore, ...) do NOT trigger a release on their
+  // own — see the header comment. They only ride along in the notes of a
+  // release a RELEASING-type commit already triggered above.
   return null;
 }
 
