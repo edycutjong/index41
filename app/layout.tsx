@@ -22,9 +22,22 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
-const title = 'index41 — prove transaction order inside an Ethereum block, on Creditcoin';
+/**
+ * Two lengths, deliberately. Search engines and social cards truncate at different widths, so the
+ * page copy is written to each budget rather than one string being cut twice:
+ *   title        ≤ 60  — Google truncates past ~60, X past ~70
+ *   description  ≤ 155 — Google truncates around 150–160
+ *   social*      ≤ 125 — cards often show ~125 and less again on mobile
+ * Keep `description` containing "laterality": e2e/zero-config.spec.ts asserts the real pitch is
+ * present rather than a framework default.
+ */
+const title = 'index41 — prove transaction order in an Ethereum block';
 const description =
-  'index41 recovers a transaction’s position inside an Ethereum block from the left/right laterality of its merkle authentication path, proves front-run < victim < back-run on Creditcoin, and pays the victim from a relay’s bond. Real mainnet sandwich, real on-chain ruling.';
+  'Recovers a transaction’s position in an Ethereum block from its merkle path laterality, then proves front-run < victim < back-run on Creditcoin.';
+
+const socialTitle = 'index41 — prove transaction order in an Ethereum block';
+const socialDescription =
+  'Proves front-run < victim < back-run inside a real Ethereum block, and pays the victim from the relay’s bond. On Creditcoin.';
 
 /**
  * No placeholder domain is baked in. Set NEXT_PUBLIC_SITE_URL when the page is deployed and the
@@ -60,8 +73,8 @@ export const metadata: Metadata = {
   ...(siteUrl ? { alternates: { canonical: '/' } } : {}),
   openGraph: {
     type: 'website',
-    title,
-    description,
+    title: socialTitle,
+    description: socialDescription,
     siteName: 'index41',
     locale: 'en_US',
     ...(siteUrl ? { url: '/' } : {}),
@@ -77,8 +90,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title,
-    description,
+    title: socialTitle,
+    description: socialDescription,
     images: ['/og-image-v2.png'],
   },
   icons: {
