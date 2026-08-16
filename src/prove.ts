@@ -25,7 +25,7 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 
 import { JsonRpcProvider, Wallet, formatEther } from 'ethers';
 import { blockProver, chainInfo, utils } from '@gluwa/usc-sdk';
@@ -446,7 +446,7 @@ async function main() {
   log.line('  Creditcoin read the position of a transaction inside an Ethereum block, and the bond paid.');
   log.rule();
   log.line(`finished ${new Date().toISOString()}`);
-  log.line(`evidence written to ${OUTPUT}`);
+  log.line(`evidence written to ${relative(REPO_ROOT, OUTPUT)}`);
 }
 
 main().catch((err) => {

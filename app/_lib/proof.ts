@@ -15,7 +15,7 @@
  */
 
 import artifactJson from '@/data/proof-artifact.json';
-import { indexFromLaterality, readClaimReceipt, type DecodedRuling } from './chain';
+import { CC3, indexFromLaterality, readClaimReceipt, type DecodedRuling } from './chain';
 
 export type Artifact = typeof artifactJson;
 export const artifact: Artifact = artifactJson;
@@ -64,8 +64,18 @@ export interface ProofView {
  *
  * The join key is the index the CHAIN reported. If the artifact has no path for a position the
  * chain emitted, that is a contradiction and this throws rather than quietly dropping a row.
+ *
+ * `rpc` is the endpoint actually attempted for this call — `CC3.rpcUrl` (which respects
+ * `NEXT_PUBLIC_CC3_RPC` if set) for a live read, or the artifact's recorded endpoint for a cached
+ * one. It is never assumed to be the artifact's endpoint just because the artifact exists.
  */
-function assemble(ruling: DecodedRuling, mode: ProvenanceMode, at: string, liveError?: string): ProofView {
+function assemble(
+  ruling: DecodedRuling,
+  mode: ProvenanceMode,
+  at: string,
+  rpc: string,
+  liveError?: string,
+): ProofView {
   const legs: Leg[] = ruling.verified.map((v) => {
     const recorded = artifact.legs.find((l) => l.index === v.txIndex);
     if (!recorded) {
@@ -88,7 +98,7 @@ function assemble(ruling: DecodedRuling, mode: ProvenanceMode, at: string, liveE
   });
 
   return {
-    provenance: { mode, at, rpc: artifact.network.rpc, liveError, capturedAt: artifact.capturedAt },
+    provenance: { mode, at, rpc, liveError, capturedAt: artifact.capturedAt },
     claim: ruling.claim,
     ruling: ruling.ruling,
     harmPaid: ruling.harmPaid,
@@ -134,12 +144,13 @@ export function rulingFromArtifact(): DecodedRuling {
 export async function getProofView(timeoutMs = 6500): Promise<ProofView> {
   try {
     const live = await readClaimReceipt(timeoutMs);
-    return assemble(live, 'live-chain-read', new Date().toISOString());
+    return assemble(live, 'live-chain-read', new Date().toISOString(), CC3.rpcUrl);
   } catch (err) {
     return assemble(
       rulingFromArtifact(),
       'cached-proof-artifact',
       artifact.capturedAt,
+      artifact.network.rpc,
       err instanceof Error ? err.message : String(err),
     );
   }

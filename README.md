@@ -9,8 +9,9 @@
     ruled on by a bonded contract on Creditcoin CC3, in
     <a href="https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810">one real transaction</a>
     — status <code>1</code>, 1,092,100 gas, <b>1.456%</b> of <code>MAX_GAS_CAP</code>. The positions are
-    not written anywhere in this repository's web code: they are decoded, on every page load, from the
-    logs the Attestcoin precompile itself wrote. <b>120 Foundry tests, 0 failed.</b>
+    not hardcoded in the page's code path: they are decoded, on every page load, from the
+    logs the Attestcoin precompile itself wrote (a committed capture of that same read backs the
+    page when a live one is unreachable — see below). <b>120 Foundry tests, 0 failed.</b>
   </p>
 
   <br/>
@@ -49,14 +50,15 @@ npm run dev          # http://localhost:3000 — no .env, no wallet, no API key,
 
 The page shows three rows of Ethereum mainnet block `25764741` lighting up in sequence —
 **14 searcher buy · 15 the victim · 16 searcher sell** — then `SandwichProven` and the bond paying
-out. **Those indices are not written anywhere in the web code.** They are decoded, on every page
+out. **Those indices are not hardcoded in the page's code path.** They are decoded, on every page
 load, from the three `TransactionVerified` logs the Attestcoin precompile itself wrote inside the
 receipt of CC3 transaction
 [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810).
 
 A banner above the ledger states which of the two **real** sources is on screen — a live chain read,
-or the captured artifact if the public node is unreachable — and there is no third source. There is
-no demo mode, no mock and no toggle anywhere in this repository.
+or the committed [`data/proof-artifact.json`](data/proof-artifact.json) capture of that same read if
+the public node is unreachable — and there is no third source. There is no demo mode, no mock and no
+toggle anywhere in this repository.
 
 Alongside each index the page shows the laterality decode that produced it (`RLLLRRRR → 14`), the
 real sibling hashes it was folded from, and the position the precompile emitted, so the off-chain

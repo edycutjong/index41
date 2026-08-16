@@ -51,7 +51,7 @@ Every row was read from the chain, not asserted.
 | Contract tests | **120** Foundry unit tests across 4 suites, 0 failed |
 | E2E tests | **48** Playwright tests (chromium + mobile), zero config |
 | Exhaustive verification | **256 positions** — every leaf of the depth-8 tree round-tripped through the laterality decoder in `test_TxIndexOfRoundTripsEveryPositionInTheTree` |
-| Attestcoin depth | **36 surfaces** made load-bearing, **24 undocumented**; **31** execute on a clean default run, all 36 across the default and `--kill-hosted` runs. The official examples exercise **3**. |
+| Attestcoin depth | **36 surfaces** made load-bearing, **24 undocumented**; **30** execute on a clean default run (3 more are constructed but never queried), all 36 across the default and `--kill-hosted` runs. The official examples exercise **3**. |
 
 ---
 

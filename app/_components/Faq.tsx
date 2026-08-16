@@ -82,11 +82,11 @@ export function Faq({ view }: { view: ProofView }) {
           The pipeline makes <span className="text-hi">36 distinct Attestcoin / USC-SDK surfaces</span>{' '}
           load-bearing, <span className="text-hi">24 of them undocumented</span>. To be precise about which
           ones a judge actually causes to run:{' '}
-          <span className="text-accent">31 of the 36 execute on a clean, zero-flag default run</span>; the
-          remaining 5 belong to the local proving path and execute under{' '}
-          <code className="text-primary-ink">--kill-hosted</code>. The official-example baseline, for
-          comparison, is 3 methods on 2 classes. The surface-by-surface table is in{' '}
-          <code className="text-primary-ink">docs/PIPELINE.md</code>.
+          <span className="text-accent">30 of the 36 execute on a clean, zero-flag default run</span>; 3 more
+          are constructed but never queried on that path, and the remaining 3 belong to the local proving
+          path and execute under <code className="text-primary-ink">--kill-hosted</code>. The
+          official-example baseline, for comparison, is 3 methods on 2 classes. The surface-by-surface table
+          is in <code className="text-primary-ink">docs/PIPELINE.md</code>.
         </>
       ),
     },

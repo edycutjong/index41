@@ -23,7 +23,7 @@
 
 import { readFileSync } from 'node:fs';
 import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { Contract, ContractFactory, JsonRpcProvider, Wallet, formatEther, formatUnits, id } from 'ethers';
@@ -443,7 +443,7 @@ async function main() {
   log(`  proveOrder tx  ${tx.hash}`);
   rule();
   log(`finished ${new Date().toISOString()}`);
-  log(`evidence written to ${OUTPUT}`);
+  log(`evidence written to ${relative(ROOT, OUTPUT)}`);
 }
 
 main().catch((err) => {
