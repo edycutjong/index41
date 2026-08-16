@@ -143,9 +143,12 @@ export default async function JudgePage() {
               <span className="font-mono">test_TxIndexOfRoundTripsEveryPositionInTheTree</span>
             </Row>
             <Row label="Attestcoin surfaces">
-              36 made load-bearing, 24 of them undocumented; 30 execute on a clean default run (3 more are
-              constructed but never queried), all 36 across the default and{' '}
-              <span className="font-mono">--kill-hosted</span> runs (official examples: 3)
+              36 made load-bearing, 24 of them undocumented; 30 do real work on a clean default run (3 more
+              are constructed but never queried), all 36 across the default and{' '}
+              <span className="font-mono">--kill-hosted</span> runs (official examples: 3). Counted by the
+              run itself — <span className="font-mono">npm run prove</span> prints{' '}
+              <span className="text-accent">ATTESTCOIN SURFACES EXERCISED THIS RUN: 30</span> and names all
+              36 into <span className="font-mono">docs/pipeline-output.txt</span>
             </Row>
           </tbody>
         </table>

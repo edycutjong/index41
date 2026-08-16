@@ -23,6 +23,7 @@ export const EVIDENCE = [
   'docs/pipeline-output-local-prover.txt',
   'docs/pipeline-output-replay.txt',
   'docs/spike-output.txt',
+  'docs/bench-output.txt',
   'data/proof-artifact.json',
   'data/sandwich-25764741.json',
   'contracts/src/Index41.sol',

@@ -12,8 +12,8 @@ and a number there ever disagree, the page is right — it read the chain; this 
 
 ## The 30-second path
 
-1. Open the demo surface (`npm install && npm run dev` → `http://localhost:3000`, or the deployed
-   URL). Scroll to the ledger. Three rows of a real Ethereum mainnet block light up in sequence.
+1. Open the demo surface — **https://index41-lovat.vercel.app** — or run it yourself with
+   `npm install && npm run dev` → `http://localhost:3000`. Scroll to the ledger. Three rows of a real Ethereum mainnet block light up in sequence.
 2. Read the banner above the ledger. It names which of the **two real sources** is on screen right
    now — `LIVE CHAIN READ` or `CACHED REAL PROOF`. There is no third source and no mock.
 3. Click **re-read the chain**. That hits `/api/proof`, which performs a real
@@ -49,9 +49,10 @@ Every row was read from the chain, not asserted.
 | Harm paid from the bond | `219,708` wei → `0x51f400…6a1410`, the address the *proof* says was sandwiched. Paid == computed. |
 | Gas | `1,092,100` — **1.456%** of `MAX_GAS_CAP` (75,000,000), for 3× `verifyAndEmit` + 3× `calculateTxIndex` + the ordering assert + the events |
 | Contract tests | **120** Foundry unit tests across 4 suites, 0 failed |
-| E2E tests | **48** Playwright tests (chromium + mobile), zero config |
+| E2E tests | **54** Playwright tests (chromium + mobile), zero config |
 | Exhaustive verification | **256 positions** — every leaf of the depth-8 tree round-tripped through the laterality decoder in `test_TxIndexOfRoundTripsEveryPositionInTheTree` |
-| Attestcoin depth | **36 surfaces** made load-bearing, **24 undocumented**; **30** execute on a clean default run (3 more are constructed but never queried), all 36 across the default and `--kill-hosted` runs. The official examples exercise **3**. |
+| Attestcoin depth | **36 surfaces** made load-bearing, **24 undocumented**; **30** do real work on a clean default run (3 more are constructed but never queried), all 36 across the default and `--kill-hosted` runs. The official examples exercise **3**. **Counted by the run itself** — `npm run prove` prints `ATTESTCOIN SURFACES EXERCISED THIS RUN: 30` and names all 36, into `docs/pipeline-output.txt`. |
+| Latency | p50 / p95 over repeated real runs of three paths — hosted proof fetch, prover-free local build, full prove→ruling. `npm run bench`, numbers in [`DEMO.md`](DEMO.md#full-results) |
 
 ---
 
@@ -73,7 +74,10 @@ node scripts/capture-proof.mjs --check
 npm test                              # forge test --summary — 120 tests, 4 suites
 
 # the E2E suite (needs a build first)
-npm run build && npm run e2e          # 48 tests
+npm run build && npm run e2e          # 54 tests
+
+# every deployed court runs the same executable code — read live, no explorer trusted
+node scripts/verify-bytecode.mjs
 
 # the full on-chain run: deploy → bond → declare coverage → prove → pay, on CC3 testnet
 # needs a funded CC3 key at ~/.config/creditcoin/index41-testnet.json — never in this repo
@@ -84,7 +88,16 @@ npm run prove -- --kill-hosted --fresh-court   # same, with the hosted prover sw
 
 `--kill-hosted` is **not** a kill switch for the product — it only changes which of the three
 interchangeable proof sources answers. Both runs produce the same ruling and the same gas
-(`docs/pipeline-output.txt`, `docs/pipeline-output-local-prover.txt`).
+(`docs/pipeline-output.txt`, `docs/pipeline-output-local-prover.txt`). `--fresh-court` deploys a
+court and touches no Attestcoin surface; it is needed because the replay guard retires a court once
+it has ruled.
+
+The repeated-run benchmark, if you want the latency numbers rather than a single shot — real
+network, real chain, no offline mode, ~25 minutes and a little testnet gas:
+
+```bash
+npm run bench                         # p50/p95 for three paths; exits non-zero if a check fails
+```
 
 ---
 
@@ -122,6 +135,7 @@ Disclosed rather than discovered:
 | The same run with no proof service at all | [`docs/pipeline-output-local-prover.txt`](docs/pipeline-output-local-prover.txt) |
 | The replay guard refusing a second claim | [`docs/pipeline-output-replay.txt`](docs/pipeline-output-replay.txt) |
 | The day-one spike, against the live network | [`docs/spike-output.txt`](docs/spike-output.txt) |
+| The benchmark transcript — p50/p95, and the rulings it landed | [`docs/bench-output.txt`](docs/bench-output.txt) |
 | The court | [`contracts/src/Index41.sol`](contracts/src/Index41.sol) |
 | Security posture and boundary tests | [`.github/SECURITY.md`](.github/SECURITY.md) |
 

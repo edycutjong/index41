@@ -16,6 +16,7 @@
 
   <br/>
 
+  [![Live demo](https://img.shields.io/badge/▶️_Live_demo-index41-0ea5e9?style=for-the-badge)](https://index41-lovat.vercel.app)
   [![Judge in 30 seconds](https://img.shields.io/badge/⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![The ruling on Blockscout](https://img.shields.io/badge/⛓️_The_ruling-on_Blockscout-22c55e?style=for-the-badge)](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810)
   [![The proof pipeline](https://img.shields.io/badge/🔬_The-proof_pipeline-f59e0b?style=for-the-badge)](docs/PIPELINE.md)
@@ -140,7 +141,7 @@ checkpoint Creditcoin already holds — **before a single unit of gas is spent**
 | Tests | Foundry — **120 unit tests**, 4 suites | including a 256-leaf exhaustive round-trip of the decode |
 | Pipeline | TypeScript + `@gluwa/usc-sdk` 0.18.0, ethers v6 | three interchangeable proof sources behind one interface |
 | Demo | Next.js 16 (App Router), Tailwind, ShadCN | server component reads the ruling off CC3 before first paint |
-| E2E | Playwright — **48 tests**, chromium + Pixel 7 | asserts invariants, never the literal indices |
+| E2E | Playwright — **54 tests**, chromium + Pixel 7 | asserts invariants, never the literal indices |
 | Chain | Creditcoin CC3 testnet (102031), Blockscout | source-verified contract, so the explorer decodes it itself |
 
 ## 🏆 Attestcoin Protocol Integration
@@ -161,10 +162,25 @@ plus `getLatestAttestedHeightAndHash`). That is the field's baseline.
 
 **The number to hold us to is 30, not 36**, and the gap is worth spelling out rather than hiding,
 because it is exactly the kind of thing a surface count is normally used to smuggle past a reader.
-The proof layer is a three-rung ladder. On a default run rung 1 answers in 619 ms, so rungs 2 and 3
-are *built* but never asked a question. That splits the 36 three ways, and every line of it is
-checkable against the committed transcript
-[`docs/pipeline-output.txt`](docs/pipeline-output.txt):
+The proof layer is a three-rung ladder. On a default run rung 1 answers first, so rungs 2 and 3
+are *built* but never asked a question. That splits the 36 three ways:
+
+**And you do not have to take the split from this table.** The pipeline counts each surface at the
+moment it exercises it and prints the tally, by name, into the transcript it commits —
+[`docs/pipeline-output.txt`](docs/pipeline-output.txt) ends with:
+
+```
+ATTESTCOIN SURFACES EXERCISED THIS RUN: 30
+  30 did real work · 3 constructed but never queried · 3 not reached · 36 catalogued ·
+  21 of the 30 are undocumented
+```
+
+…followed by all 36 listed by name under those three headings.
+[`docs/pipeline-output-local-prover.txt`](docs/pipeline-output-local-prover.txt) prints **32**: the
+same run with the standby rungs forced to answer and the four proof-gen HTTP surfaces unreachable.
+The union of the two runs is all 36 — 30 of them on the default path. The counter lives in
+[`src/surfaces.ts`](src/surfaces.ts) and **throws on any id outside the 36-row catalogue**, so the
+number cannot be padded by a typo. The split, then:
 
 | On a zero-flag `npm run prove` | Count | Which |
 |---|---:|---|
@@ -185,7 +201,7 @@ disagreements, zero symbols missing from the ledger**. The ledger is authoritati
 below carries its verdicts, not a second opinion. The four proof-gen HTTP endpoints fall outside
 that ledger's SDK scope and are classified against the prover's own published OpenAPI spec and the
 docs site (2 documented, 2 not). The totals therefore land at **36 surfaces / 24 undocumented /
-12 documented**, and
+12 documented — 30 of the 36 doing real work on a default run**, and
 [`docs/PIPELINE.md`](docs/PIPELINE.md#attestcoin-surfaces-this-pipeline-makes-load-bearing) states
 the identical numbers.
 
@@ -367,13 +383,22 @@ Index41HarmTest        23   realized-profit accounting, replay protection, doubl
 |---|---|---|
 | Contracts | Foundry · `forge fmt --check` | **120 tests**, 4 suites, 0 failed · formatter clean |
 | Exhaustive verification | Foundry | **256 positions** — every leaf of the depth-8 tree round-tripped |
+| Latency | `npm run bench` — p50/p95 over repeated real runs | three paths, correctness-gated · [`DEMO.md`](DEMO.md#full-results) |
+| Deployed-code identity | `node scripts/verify-bytecode.mjs` | every court runs byte-identical executable code |
 | Code quality | ESLint 9 (`next/core-web-vitals` + `next/typescript`) · `tsc --noEmit` | clean at `--max-warnings=0` |
-| E2E | Playwright, chromium + Pixel 7 | **48 tests** — zero config, no `.env`, no wallet |
+| E2E | Playwright, chromium + Pixel 7 | **54 tests** — zero config, no `.env`, no wallet |
 | Performance | Lighthouse CI over `/` and `/judge` | perf **100** · a11y **96** · best-practices **100** · SEO **100** |
 | Security — SAST | CodeQL (`javascript-typescript`, `security-and-quality`) | weekly + every push/PR |
 | Security — secrets | gitleaks over the **full git history** + working tree, TruffleHog | no leaks found |
 | Security — SCA | `npm audit` (production tree, blocking) + Dependabot | **0 vulnerabilities** in the shipped tree |
 | CI/CD | GitHub Actions — 6 stages, parallel, concurrency-cancelled | contracts + TypeScript + Next, all three gated |
+
+**The latency numbers are repeated-run, not one lucky shot.** `npm run bench` proves the same
+committed sandwich over and over against the real prover, the real Ethereum RPCs and the real CC3
+testnet — no offline mode, no mock, and every trial correctness-gated on positions 14 / 15 / 16, one
+shared merkle root, a status-1 receipt and `paid == computed`. It reports p50 and p95 for the hosted
+proof fetch, the local prover-free proof build and the full prove-to-ruling path, and it exits
+non-zero if any check fails. Numbers, methodology and limitations: [`DEMO.md`](DEMO.md#full-results).
 
 The one exhaustive test rather than an example:
 `test_TxIndexOfRoundTripsEveryPositionInTheTree` walks **all 256 leaves** of the depth-8 tree and
@@ -388,7 +413,7 @@ so. The **real** precompile was confirmed separately and live on CC3 against the
 ([`docs/spike-output.txt`](docs/spike-output.txt), and again in
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)).
 
-A note on the E2E suite, because it is the easy place to cheat: **none of the 48 tests assert `14`,
+A note on the E2E suite, because it is the easy place to cheat: **none of the 54 tests assert `14`,
 `15` or `16`.** They assert invariants — that each leg's off-chain laterality decode equals the index
 the precompile emitted, that the three positions are strictly increasing, that harm paid equals harm
 computed, and that the page names which of the two real sources it used. A test that hard-coded the
@@ -446,14 +471,14 @@ forge build                    # default profile — unit tests link their own E
 npm test                       # forge test --summary — 120 tests, all four suites
 npm run test:gas               # per-test gas report
 
-npm run build && npm run e2e   # Playwright — 48 tests, chromium + mobile, zero config
+npm run build && npm run e2e   # Playwright — 54 tests, chromium + mobile, zero config
 npm run lint                   # ESLint over app/ src/ scripts/
 npm run typecheck              # tsc --noEmit
 npm run lighthouse             # Lighthouse CI over / and /judge
 npm run secrets                # gitleaks over the full git history AND the working tree
 
 npm run ci                     # ESLint + tsc + forge fmt --check + 120 forge tests + npm audit
-npm run ci:full                # …plus the Next production build and the 48-test Playwright suite
+npm run ci:full                # …plus the Next production build and the 54-test Playwright suite
 make security-scan             # the above, plus npm audit and a licence check
 ```
 
@@ -493,7 +518,7 @@ app/                      the demo surface (Next.js 16, App Router)
   _components/ProofTheatre.tsx   the ledger: three rows of block 25764741 lighting in sequence
   api/proof/route.ts      re-reads the chain on demand, behind the page's own button
 
-e2e/                      48 Playwright tests — invariants, never literal indices
+e2e/                      54 Playwright tests — invariants, never literal indices
 .github/workflows/        CI (6 stages) · CodeQL · gitleaks
 ```
 

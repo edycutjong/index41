@@ -45,3 +45,7 @@ scratch/
 /specs/
 /submission/
 /graphify-out/
+
+# vercel — deployment link metadata (project/org ids), not source
+/.vercel/
+.vercel

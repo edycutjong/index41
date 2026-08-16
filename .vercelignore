@@ -1,0 +1,17 @@
+# What Vercel does not need to build the demo surface.
+#
+# The web app is `app/` plus `data/proof-artifact.json`. The Foundry project, the proving
+# pipeline's build output and every local test artifact are irrelevant to the deployed page and
+# only slow the upload down. Nothing here is required at runtime: `/api/proof` reads the chain
+# over plain JSON-RPC and needs no key, no wallet and no `.env`.
+
+lib/
+out/
+cache/
+broadcast/
+.next/
+test-results/
+playwright-report/
+blob-report/
+.lighthouseci/
+docs/index41-pitch-deck.pdf
