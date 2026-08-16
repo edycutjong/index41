@@ -47,7 +47,7 @@ export function FinalCta({ view }: { view: ProofView }) {
             </Button>
           </div>
 
-          <div className="mx-auto mt-12 max-w-xl">
+          <div className="mx-auto mt-12 max-w-2xl">
             <div className="plate rounded-md p-5 text-left">
               <div className="mb-3 flex items-center gap-2">
                 <Terminal className="h-3.5 w-3.5 text-low" aria-hidden />
@@ -55,12 +55,13 @@ export function FinalCta({ view }: { view: ProofView }) {
               </div>
               <pre className="scroll-x font-mono text-[0.8125rem] leading-relaxed text-mid">
                 <code>{`${REPO_URL ? `git clone ${REPO_URL}\n` : '# from the repository root\n'}npm install
-node scripts/capture-proof.mjs --check   # re-reads every source, diffs the artifact
-npm run dev                              # the page you are looking at`}</code>
+npm run dev                              # the page you are looking at
+node scripts/capture-proof.mjs --check   # re-read every source, diff the artifact`}</code>
               </pre>
               <p className="mt-3 font-mono text-[0.625rem] leading-relaxed text-low">
-                no .env · no wallet · no API key — <code>--check</code> exits non-zero if a live capture and
-                the committed artifact disagree
+                no .env · no wallet · no API key. <code>--check</code> re-reads Creditcoin, the proof service
+                and an Ethereum mainnet RPC, then exits non-zero if any of them disagrees with the committed
+                artifact.
               </p>
             </div>
           </div>
