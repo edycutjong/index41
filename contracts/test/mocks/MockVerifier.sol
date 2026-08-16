@@ -51,10 +51,6 @@ contract MockVerifier is INativeQueryVerifier {
         rejectUnknownBlocks = true;
     }
 
-    function setRejectUnknownBlocks(bool v) external {
-        rejectUnknownBlocks = v;
-    }
-
     function setRevertInsteadOfReport(bool v) external {
         revertInsteadOfReport = v;
     }

@@ -92,17 +92,6 @@ library EvmV1Fixture {
         out[1] = b;
     }
 
-    function threeLogs(LogSpec memory a, LogSpec memory b, LogSpec memory c)
-        internal
-        pure
-        returns (LogSpec[] memory out)
-    {
-        out = new LogSpec[](3);
-        out[0] = a;
-        out[1] = b;
-        out[2] = c;
-    }
-
     // -------------------------------------------------------------------------------------
     // Encoder
     // -------------------------------------------------------------------------------------
