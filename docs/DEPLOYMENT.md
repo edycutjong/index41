@@ -134,12 +134,36 @@ committed evidence:
 | Court | What it proved | Claim tx |
 |---|---|---|
 | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) | this deployment — hosted prover, verified source | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) |
-| [`0x2084C677…82DDD`](https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD) | the default pipeline run | [`0x53ac43ed…03b8b`](https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b) |
-| [`0xc5F604B7…66C33`](https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33) | `--kill-hosted` — every proof rebuilt locally, no proof service at all | [`0xb95466d9…16fb2`](https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2) |
+| [`0xBA3b9f7C…8C17d`](https://creditcoin-testnet.blockscout.com/address/0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d) | the default pipeline run — [`pipeline-output.txt`](pipeline-output.txt) | [`0xddee0f3f…88f58d`](https://creditcoin-testnet.blockscout.com/tx/0xddee0f3f370d9834ab1bd87c5b10c24436895ddb014a19d85591e4d84088f58d) |
+| [`0x54cfF9e7…848c63`](https://creditcoin-testnet.blockscout.com/address/0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63) | `--kill-hosted` — every proof rebuilt locally, no proof service at all — [`pipeline-output-local-prover.txt`](pipeline-output-local-prover.txt) | [`0x7de4c750…e92455`](https://creditcoin-testnet.blockscout.com/tx/0x7de4c750210e36aea9eca97995172122f76c3dbb51df14436a674db4f4e92455) |
 
-All three are verified on Blockscout (identical bytecode, so the explorer matched the later two
-automatically). All three used **1,092,100** gas for the claim — the cost of a ruling does not
-depend on where the proof came from.
+All three used **1,092,100** gas for the claim — the cost of a ruling does not depend on where the
+proof came from, and every one of them emitted the same three `TransactionVerified` logs for
+positions 14, 15 and 16.
+
+**On source verification — measured, not asserted.** The headline deployment `0xb37Bc52b…10eC2`
+is source-verified on Blockscout and is the contract every judge-facing surface points at. The two
+transcript courts were deployed later and Blockscout matches identical bytecode to an
+already-verified contract on its own schedule, so their badges may lag. Do not wait for a badge —
+check the code:
+
+```bash
+node scripts/verify-bytecode.mjs
+```
+
+It reads `eth_getCode` for all three live from the CC3 RPC, splits off the CBOR metadata trailer
+(its length is in its own last two bytes) and hashes what is left. Result, run for this document:
+
+| Court | Total | Executable | `sha256` of the executable |
+|---|---:|---:|---|
+| `0xb37Bc52b…10eC2` | 15,213 B | 15,160 B | `71c40acb…d8139e` |
+| `0xBA3b9f7C…8C17d` | 15,213 B | 15,160 B | `71c40acb…d8139e` |
+| `0x54cfF9e7…848c63` | 15,213 B | 15,160 B | `71c40acb…d8139e` |
+
+**All three run byte-identical executable code.** The whole-blob hashes are *not* identical, and the
+difference is worth naming rather than glossing: the trailing 53-byte Solidity metadata blob encodes
+an IPFS digest of the compilation inputs, so it changes between build sessions even when no
+instruction does. That is the entire delta — 32 bytes of digest, outside the executable region.
 
 ## Reproducing this exactly
 

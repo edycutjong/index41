@@ -1,6 +1,9 @@
 index41 — THE PROVING PIPELINE
 three Ethereum mainnet transaction hashes in, one Creditcoin ruling out
-run at 2026-08-16T04:10:20.257Z
+run at 2026-08-16T09:38:24.555Z
+THE DEFAULT RUN — the hosted proof source answers first, as it does with no flags at all.
+invoked as: npm run prove -- --fresh-court
+The Index41 address below is this run's own court, NOT the headline deployment — that one is in docs/DEPLOYMENT.md, and docs/PIPELINE.md tabulates every proven run. A court that has ruled is retired by the replay guard, so an independent run needs --fresh-court; that flag deploys a court and touches no Attestcoin surface. --kill-hosted is the only flag that changes which proof source answers.
 
 ── 0. Input ──────────────────────────────────────────────────────────────────
 no hashes given — using the recorded sandwich in data/sandwich-25764741.json
@@ -11,9 +14,9 @@ no hashes given — using the recorded sandwich in data/sandwich-25764741.json
   back-run   0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
 
 ── 1. Networks ───────────────────────────────────────────────────────────────
-creditcoin      https://rpc.cc3-testnet.creditcoin.network · chainId 102031 · head 5317764
-ethereum        https://ethereum-rpc.publicnode.com · head 25765135
-signer          0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · 9997.994119418 CTC
+creditcoin      https://rpc.cc3-testnet.creditcoin.network · chainId 102031 · head 5319075
+ethereum        https://ethereum-rpc.publicnode.com · head 25766772
+signer          0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · 9994.986453825499340876 CTC
 verifier        0x0000000000000000000000000000000000000FD2 (from the SDK's own constant)
 decoder         0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f (Creditcoin's deployed EvmV1Decoder)
 prover          https://prover.cc3-testnet.creditcoin.network
@@ -28,16 +31,16 @@ Those positions come from an Ethereum RPC and index41 does not act on them.
 They are the ground truth the Creditcoin precompile has to reproduce, unaided.
 
 ── 3. Attestation — adaptive, not a flat sleep loop ──────────────────────────
-prover health   healthy · cc3=true eth=true · up 463952s
+prover health   healthy · cc3=true eth=true · up 483595s
 
 asking the prover for a height it cannot possibly serve, to see how it says no:
-  HTTP 422 BlockNotReady: The continuity proof cannot be created because block 25765103 is not attested to yet. Last attested block: 25765100
-  retriable=true block_number=25765103 last_attested_block=25765100
+  HTTP 422 BlockNotReady: The continuity proof cannot be created because block 25766733 is not attested to yet. Last attested block: 25766730
+  retriable=true block_number=25766733 last_attested_block=25766730
   → 3 blocks behind, so the adaptive poller would sleep 36s, not a flat 15s
 
-attested tip    25765100 0x61c44727c6215ce169f5a76eeb8f2d50d624d88e98fab535c9ffa549fe8b01ed (isAttestation=true)
-waitUntilHeight returned after 317ms · block is 359 below the tip, so extraDelayMs=0 (the SDK default of 15000 would have added 15000ms of nothing)
-prover ready    after 1 attempt(s), 0ms slept, schedule [] · attested-height 25765100
+attested tip    25766730 0x9f8485140cfe5561f9e7b377dbda4b8693ef7f17fa4306d3afcc7187a436482a (isAttestation=true)
+waitUntilHeight returned after 343ms · block is 1989 below the tip, so extraDelayMs=0 (the SDK default of 15000 would have added 15000ms of nothing)
+prover ready    after 1 attempt(s), 0ms slept, schedule [] · attested-height 25766730
 continuity      parent 25764700 (attestation=false) → child 25764800 (attestation=false)
 
 ── 4. Proofs — three interchangeable sources, hosted last-resort-free ────────
@@ -48,7 +51,7 @@ continuity      parent 25764700 (attestation=false) → child 25764800 (attestat
   local:RawProofBuilder (no hosted prover)
       trusts: an Ethereum RPC + the Creditcoin chain-info precompile. No proof service.
 
-  ✓ hosted:proof-batch (by block position) — 619ms
+  ✓ hosted:proof-batch (by block position) — 1200ms
 
 source used     hosted:proof-batch (by block position)
                 fromHeader=25764741 toHeader=25764741 cached=false
@@ -95,23 +98,23 @@ victim          0x51f400b9770aD2BDdb7CF74664F5Cd1DAF6A1410 · entry point 0x6131
 
 ── 8. The court ──────────────────────────────────────────────────────────────
 deploying Index41 (linked against the on-chain EvmV1Decoder)…
-Index41        0x2084C677901067f15c59C48beFeb168b26982DDD  (deploy gas 3342081)
-explorer       https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD
+Index41        0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d  (deploy gas 3342081)
+explorer       https://creditcoin-testnet.blockscout.com/address/0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d
 bonding 1.0 CTC for relay 0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24…
 declaring coverage of entry point 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5…
-Index41         0x2084C677901067f15c59C48beFeb168b26982DDD
+Index41         0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d
 relay           0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · bond 1.0 CTC · covers 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5=true
 claim id        0x614797006ffc0dde2116854291d5d94a83b9f5bb6e8d3412aa58ada39ebe7e93
 
 ── 9. Submit — 3× verifyAndEmit in ONE Creditcoin transaction ────────────────
 calldata        17860 bytes (utils.hex.bytesInHexString)
 gas limit       1539012 from utils.gas.computeGasLimit
-MAX_GAS_CAP     75000000 — the budget is 2.050% of it
+MAX_GAS_CAP     75000000 — the budget is 2.052% of it
 sending with    1539012
 
-CC3 tx          0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b
-block           5317769 · status 1
-GAS USED        1092100  (1.450% of MAX_GAS_CAP)
+CC3 tx          0xddee0f3f370d9834ab1bd87c5b10c24436895ddb014a19d85591e4d84088f58d
+block           5319080 · status 1
+GAS USED        1092100  (1.456% of MAX_GAS_CAP)
 
 ── 10. The ruling ────────────────────────────────────────────────────────────
 the precompile's OWN event, once per verifyAndEmit — not our contract, not this script:
@@ -126,10 +129,58 @@ the precompile's OWN event, once per verifyAndEmit — not our contract, not thi
   index 15   the victim       0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
   index 16   searcher sell    0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
 
-explorer        https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b
-contract        https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD
+explorer        https://creditcoin-testnet.blockscout.com/tx/0xddee0f3f370d9834ab1bd87c5b10c24436895ddb014a19d85591e4d84088f58d
+contract        https://creditcoin-testnet.blockscout.com/address/0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d
 
   Creditcoin read the position of a transaction inside an Ethereum block, and the bond paid.
+
+── Attestcoin surface tally ──────────────────────────────────────────────────
+ATTESTCOIN SURFACES EXERCISED THIS RUN: 30
+  30 did real work · 3 constructed but never queried · 3 not reached · 36 catalogued · 21 of the 30 are undocumented
+
+did real work (30):
+   1. chainInfo.PrecompileChainInfoProvider
+   2. chainInfo.getSupportedChainByKey   [undocumented]
+   3. chainInfo.getAttestationGenesisHeight   [undocumented]
+   4. chainInfo.getLatestAttestedHeightAndHash   [undocumented]
+   5. chainInfo.getContinuityBounds   [undocumented]
+   6. chainInfo.waitUntilHeightAttested   [undocumented]
+   7. chainInfo.getAttestationHeightForDigest   [undocumented]
+   8. chainInfo.getCheckpointForHeight   [undocumented]
+   9. blockProver.BLOCK_PROVER_PRECOMPILE_ADDRESS
+  10. blockProver.PrecompileBlockProver
+  11. blockProver.verifySingle
+  12. blockProver.computeTransactionIndex   [undocumented]
+  19. proofProvider.merkle.hashLeaf   [undocumented]
+  20. proofProvider.merkle.hashInner   [undocumented]
+  21. proofProvider.merkle.computeDigestOf   [undocumented]
+  22. encoding.getTransactionWithRaw   [undocumented]
+  23. encoding.abiEncode   [undocumented]
+  24. encoding.EncodingVersion
+  25. utils.gas.computeGasLimit   [undocumented]
+  26. utils.gas.MAX_GAS_CAP   [undocumented]
+  27. utils.gas.gasAsPercentageOfMax   [undocumented]
+  28. utils.hex.bytesInHexString   [undocumented]
+  29. utils.decoder.decodeEvmV1Transaction   [undocumented]
+  30. GET /api/v1/health
+  31. GET /api/v1/attested-height/{chain_key}
+  32. POST /api/v1/proof-batch/{chain_key}   [undocumented]
+  33. ErrorResponse.retriable / last_attested_block   [undocumented]
+  34. INativeQueryVerifier.verifyAndEmit
+  35. INativeQueryVerifier.calculateTxIndex   [undocumented]
+  36. EvmV1Decoder (deployed library)
+
+constructed, never queried — the standby proof rungs (3):
+  13. proofProvider.service.ProofBuilder
+  15. proofProvider.raw.RawProofBuilder
+  17. proofProvider.raw.blockProvider.SimpleBlockProvider   [undocumented]
+
+not reached on this run (3):
+  14. proofProvider.service.ProofBuilder.getBatchProof
+  16. proofProvider.raw.RawProofBuilder.getProof   [undocumented]
+  18. proofProvider.raw.blockProvider.BlockProvider (implemented)   [undocumented]
+
+Counted by src/surfaces.ts, recorded at the call site as each surface is exercised — not transcribed from a table. Unknown ids throw, so this number cannot be padded.
 ──────────────────────────────────────────────────────────────────────────────
-finished 2026-08-16T04:11:32.776Z
+finished 2026-08-16T09:39:33.324Z
 evidence written to docs/pipeline-output.txt

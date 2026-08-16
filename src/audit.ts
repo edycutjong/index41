@@ -30,6 +30,7 @@ import { chainInfo, encoding, proofProvider } from '@gluwa/usc-sdk';
 
 import type { ProofBundle } from './proof-sources.js';
 import type { TransactionMerkleProof } from './prover-api.js';
+import { surfaceWork } from './surfaces.js';
 
 export interface LegAudit {
   role: string;
@@ -81,8 +82,10 @@ export function lateralityBits(proof: TransactionMerkleProof): string {
 
 /** Walks the authentication path with the SDK's own hashers. Same algorithm as the precompile. */
 export function recomputeRoot(txBytes: string, proof: TransactionMerkleProof): string {
+  surfaceWork('proofProvider.merkle.hashLeaf');
   let node = proofProvider.merkle.hashLeaf(txBytes);
   for (const sibling of proof.siblings) {
+    surfaceWork('proofProvider.merkle.hashInner');
     node = sibling.isLeft
       ? proofProvider.merkle.hashInner(sibling.hash, node)
       : proofProvider.merkle.hashInner(node, sibling.hash);
@@ -95,10 +98,13 @@ export function recomputeRoot(txBytes: string, proof: TransactionMerkleProof): s
  * `encoding.abiEncode` is the exact function that produced the merkle leaves in the first place.
  */
 export async function reencodeFromSource(rpc: JsonRpcApiProvider, txHash: string): Promise<string> {
+  surfaceWork('encoding.getTransactionWithRaw');
   const tx = await encoding.getTransactionWithRaw(rpc, txHash);
   if (!tx) throw new Error(`mainnet has no transaction ${txHash}`);
   const receipt: TransactionReceipt | null = await rpc.getTransactionReceipt(txHash);
   if (!receipt) throw new Error(`mainnet has no receipt for ${txHash}`);
+  surfaceWork('encoding.abiEncode');
+  surfaceWork('encoding.EncodingVersion');
   return encoding.abiEncode(tx, receipt, encoding.EncodingVersion.V1).abi;
 }
 
@@ -184,6 +190,7 @@ export async function auditContinuity(
   let digest = lowerEndpointDigest;
   let height = bundle.blockNumber;
   for (const root of roots) {
+    surfaceWork('proofProvider.merkle.computeDigestOf');
     digest = proofProvider.merkle.computeDigestOf(height, root, digest);
     height += 1;
   }
@@ -192,6 +199,7 @@ export async function auditContinuity(
   let boundTo: ContinuityAudit['boundTo'] = 'NOTHING';
   let boundAtHeight: number | null = null;
 
+  surfaceWork('chainInfo.getAttestationHeightForDigest');
   const attestation = await info.getAttestationHeightForDigest(bundle.chainKey, digest);
   if (attestation.exists) {
     boundTo = 'attestation';
@@ -199,6 +207,7 @@ export async function auditContinuity(
   } else {
     // The upper endpoint of a continuity range is frequently a CHECKPOINT rather than a full
     // attestation. Both are on-chain; only the lookup differs, and the examples use neither.
+    surfaceWork('chainInfo.getCheckpointForHeight');
     const checkpoint = await info.getCheckpointForHeight(bundle.chainKey, toHeight);
     if (checkpoint.exists && checkpoint.hash.toLowerCase() === digest.toLowerCase()) {
       boundTo = 'checkpoint';

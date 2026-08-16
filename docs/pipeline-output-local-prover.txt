@@ -1,6 +1,9 @@
 index41 — THE PROVING PIPELINE
 three Ethereum mainnet transaction hashes in, one Creditcoin ruling out
-run at 2026-08-16T04:12:23.529Z
+run at 2026-08-16T09:39:41.578Z
+THE --kill-hosted RUN — the hosted proof service is switched off; the proof is rebuilt locally.
+invoked as: npm run prove -- --kill-hosted --fresh-court
+The Index41 address below is this run's own court, NOT the headline deployment — that one is in docs/DEPLOYMENT.md, and docs/PIPELINE.md tabulates every proven run. A court that has ruled is retired by the replay guard, so an independent run needs --fresh-court; that flag deploys a court and touches no Attestcoin surface. --kill-hosted is the only flag that changes which proof source answers.
 
 ── 0. Input ──────────────────────────────────────────────────────────────────
 no hashes given — using the recorded sandwich in data/sandwich-25764741.json
@@ -11,9 +14,9 @@ no hashes given — using the recorded sandwich in data/sandwich-25764741.json
   back-run   0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
 
 ── 1. Networks ───────────────────────────────────────────────────────────────
-creditcoin      https://rpc.cc3-testnet.creditcoin.network · chainId 102031 · head 5317772
-ethereum        https://ethereum-rpc.publicnode.com · head 25765145
-signer          0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · 9996.991564220499780292 CTC
+creditcoin      https://rpc.cc3-testnet.creditcoin.network · chainId 102031 · head 5319080
+ethereum        https://ethereum-rpc.publicnode.com · head 25766778
+signer          0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · 9993.984011523999340876 CTC
 verifier        0x0000000000000000000000000000000000000FD2 (from the SDK's own constant)
 decoder         0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f (Creditcoin's deployed EvmV1Decoder)
 prover          https://prover.invalid.creditcoin.example  ← --kill-hosted: the hosted service is gone
@@ -30,8 +33,8 @@ They are the ground truth the Creditcoin precompile has to reproduce, unaided.
 ── 3. Attestation — adaptive, not a flat sleep loop ──────────────────────────
 hosted prover disabled — attestation is read straight off the chain-info precompile
 
-attested tip    25765110 0xb0704b1ebe41e5fba8e83452eff9d7e50908082769666956ee17a8bf4742453c (isAttestation=true)
-waitUntilHeight returned after 356ms · block is 369 below the tip, so extraDelayMs=0 (the SDK default of 15000 would have added 15000ms of nothing)
+attested tip    25766740 0x9b8b13e86e97ae07b107e4f4ba560c0e305ee993bc15d09bd0dcc0d9f324ce9e (isAttestation=true)
+waitUntilHeight returned after 265ms · block is 1999 below the tip, so extraDelayMs=0 (the SDK default of 15000 would have added 15000ms of nothing)
 continuity      parent 25764700 (attestation=false) → child 25764800 (attestation=false)
 
 ── 4. Proofs — three interchangeable sources, hosted last-resort-free ────────
@@ -42,9 +45,9 @@ continuity      parent 25764700 (attestation=false) → child 25764800 (attestat
   local:RawProofBuilder (no hosted prover)
       trusts: an Ethereum RPC + the Creditcoin chain-info precompile. No proof service.
 
-  ✗ hosted:proof-batch (by block position) — 10ms — fetch failed
-  ✗ hosted:ProofBuilder.getBatchProof (SDK, by tx hash) — 13ms — Failed to generate batch proof via API: Error: Failed to fetch batch proofs: Error: getaddrinfo ENOTFOUND prover.invalid.creditcoin.example
-  ✓ local:RawProofBuilder (no hosted prover) — 133661ms
+  ✗ hosted:proof-batch (by block position) — 16ms — fetch failed
+  ✗ hosted:ProofBuilder.getBatchProof (SDK, by tx hash) — 11ms — Failed to generate batch proof via API: Error: Failed to fetch batch proofs: Error: getaddrinfo ENOTFOUND prover.invalid.creditcoin.example
+  ✓ local:RawProofBuilder (no hosted prover) — 196030ms
 
 source used     local:RawProofBuilder (no hosted prover)
                 60 continuity roots, rebuilt from Creditcoin attestations
@@ -94,23 +97,23 @@ victim          0x51f400b9770aD2BDdb7CF74664F5Cd1DAF6A1410 · entry point 0x6131
 
 ── 8. The court ──────────────────────────────────────────────────────────────
 deploying Index41 (linked against the on-chain EvmV1Decoder)…
-Index41        0xc5F604B76240dc606509e1319d8B30D518566C33  (deploy gas 3342081)
-explorer       https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33
+Index41        0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63  (deploy gas 3342081)
+explorer       https://creditcoin-testnet.blockscout.com/address/0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63
 bonding 1.0 CTC for relay 0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24…
 declaring coverage of entry point 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5…
-Index41         0xc5F604B76240dc606509e1319d8B30D518566C33
+Index41         0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63
 relay           0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24 · bond 1.0 CTC · covers 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5=true
 claim id        0x614797006ffc0dde2116854291d5d94a83b9f5bb6e8d3412aa58ada39ebe7e93
 
 ── 9. Submit — 3× verifyAndEmit in ONE Creditcoin transaction ────────────────
 calldata        17860 bytes (utils.hex.bytesInHexString)
 gas limit       1539012 from utils.gas.computeGasLimit
-MAX_GAS_CAP     75000000 — the budget is 2.050% of it
+MAX_GAS_CAP     75000000 — the budget is 2.052% of it
 sending with    1539012
 
-CC3 tx          0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2
-block           5317786 · status 1
-GAS USED        1092100  (1.450% of MAX_GAS_CAP)
+CC3 tx          0x7de4c750210e36aea9eca97995172122f76c3dbb51df14436a674db4f4e92455
+block           5319098 · status 1
+GAS USED        1092100  (1.456% of MAX_GAS_CAP)
 
 ── 10. The ruling ────────────────────────────────────────────────────────────
 the precompile's OWN event, once per verifyAndEmit — not our contract, not this script:
@@ -125,10 +128,56 @@ the precompile's OWN event, once per verifyAndEmit — not our contract, not thi
   index 15   the victim       0x7b054188f739937a2fc2c9257b48f2ccab0ec4440ce5eda7f2ec5ccbb44485a0
   index 16   searcher sell    0xb0cae362c6a6dcf08f4adfc1d510cdda851271a913cdea4bc81da010b65be23a
 
-explorer        https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2
-contract        https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33
+explorer        https://creditcoin-testnet.blockscout.com/tx/0x7de4c750210e36aea9eca97995172122f76c3dbb51df14436a674db4f4e92455
+contract        https://creditcoin-testnet.blockscout.com/address/0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63
 
   Creditcoin read the position of a transaction inside an Ethereum block, and the bond paid.
+
+── Attestcoin surface tally ──────────────────────────────────────────────────
+ATTESTCOIN SURFACES EXERCISED THIS RUN: 32
+  32 did real work · 0 constructed but never queried · 4 not reached · 36 catalogued · 22 of the 32 are undocumented
+
+did real work (32):
+   1. chainInfo.PrecompileChainInfoProvider
+   2. chainInfo.getSupportedChainByKey   [undocumented]
+   3. chainInfo.getAttestationGenesisHeight   [undocumented]
+   4. chainInfo.getLatestAttestedHeightAndHash   [undocumented]
+   5. chainInfo.getContinuityBounds   [undocumented]
+   6. chainInfo.waitUntilHeightAttested   [undocumented]
+   7. chainInfo.getAttestationHeightForDigest   [undocumented]
+   8. chainInfo.getCheckpointForHeight   [undocumented]
+   9. blockProver.BLOCK_PROVER_PRECOMPILE_ADDRESS
+  10. blockProver.PrecompileBlockProver
+  11. blockProver.verifySingle
+  12. blockProver.computeTransactionIndex   [undocumented]
+  13. proofProvider.service.ProofBuilder
+  14. proofProvider.service.ProofBuilder.getBatchProof
+  15. proofProvider.raw.RawProofBuilder
+  16. proofProvider.raw.RawProofBuilder.getProof   [undocumented]
+  17. proofProvider.raw.blockProvider.SimpleBlockProvider   [undocumented]
+  18. proofProvider.raw.blockProvider.BlockProvider (implemented)   [undocumented]
+  19. proofProvider.merkle.hashLeaf   [undocumented]
+  20. proofProvider.merkle.hashInner   [undocumented]
+  21. proofProvider.merkle.computeDigestOf   [undocumented]
+  22. encoding.getTransactionWithRaw   [undocumented]
+  23. encoding.abiEncode   [undocumented]
+  24. encoding.EncodingVersion
+  25. utils.gas.computeGasLimit   [undocumented]
+  26. utils.gas.MAX_GAS_CAP   [undocumented]
+  27. utils.gas.gasAsPercentageOfMax   [undocumented]
+  28. utils.hex.bytesInHexString   [undocumented]
+  29. utils.decoder.decodeEvmV1Transaction   [undocumented]
+  34. INativeQueryVerifier.verifyAndEmit
+  35. INativeQueryVerifier.calculateTxIndex   [undocumented]
+  36. EvmV1Decoder (deployed library)
+
+not reached on this run (4):
+  30. GET /api/v1/health
+  31. GET /api/v1/attested-height/{chain_key}
+  32. POST /api/v1/proof-batch/{chain_key}   [undocumented]
+  33. ErrorResponse.retriable / last_attested_block   [undocumented]
+
+Counted by src/surfaces.ts, recorded at the call site as each surface is exercised — not transcribed from a table. Unknown ids throw, so this number cannot be padded.
 ──────────────────────────────────────────────────────────────────────────────
-finished 2026-08-16T04:15:47.230Z
+finished 2026-08-16T09:44:03.772Z
 evidence written to docs/pipeline-output-local-prover.txt

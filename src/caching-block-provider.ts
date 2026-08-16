@@ -25,6 +25,8 @@
 import type { JsonRpcApiProvider } from 'ethers';
 import { encoding, proofProvider } from '@gluwa/usc-sdk';
 
+import { surfaceConstructed, surfaceWork } from './surfaces.js';
+
 type TransactionWithRaw = encoding.TransactionWithRaw;
 type BlockProvider = proofProvider.raw.blockProvider.BlockProvider;
 type BlockWithReceipts = proofProvider.raw.blockProvider.BlockWithReceipts;
@@ -48,34 +50,45 @@ export class CachingBlockProvider implements BlockProvider {
 
   /** Convenience: wrap the SDK's own provider, which is what the fallback path actually uses. */
   static wrapping(rpc: JsonRpcApiProvider): CachingBlockProvider {
+    surfaceConstructed('proofProvider.raw.blockProvider.SimpleBlockProvider');
     return new CachingBlockProvider(new proofProvider.raw.blockProvider.SimpleBlockProvider(rpc));
   }
 
   async getBlockNumber(): Promise<number> {
+    // Reaching any of these three methods means the SDK is driving this repo's own implementation
+    // of its `BlockProvider` interface — surface 18, and only the local prover ever gets here.
+    surfaceWork('proofProvider.raw.blockProvider.BlockProvider (implemented)');
     // The continuity builder asks for the head once per proof; the answer cannot go stale in a
     // way that matters, because every height it is compared against is already historical.
-    if (this.head === null) this.head = await this.inner.getBlockNumber();
+    if (this.head === null) {
+      surfaceWork('proofProvider.raw.blockProvider.SimpleBlockProvider');
+      this.head = await this.inner.getBlockNumber();
+    }
     return this.head;
   }
 
   async getTransaction(transactionHash: string): Promise<TransactionWithRaw | null> {
+    surfaceWork('proofProvider.raw.blockProvider.BlockProvider (implemented)');
     const key = transactionHash.toLowerCase();
     if (this.txs.has(key)) {
       this.stats.txHits += 1;
       return this.txs.get(key) ?? null;
     }
     this.stats.txMisses += 1;
+    surfaceWork('proofProvider.raw.blockProvider.SimpleBlockProvider');
     const tx = await this.inner.getTransaction(transactionHash);
     this.txs.set(key, tx);
     return tx;
   }
 
   async getBlockWithReceipts(blockNumber: number): Promise<BlockWithReceipts | null> {
+    surfaceWork('proofProvider.raw.blockProvider.BlockProvider (implemented)');
     if (this.blocks.has(blockNumber)) {
       this.stats.blockHits += 1;
       return this.blocks.get(blockNumber) ?? null;
     }
     this.stats.blockMisses += 1;
+    surfaceWork('proofProvider.raw.blockProvider.SimpleBlockProvider');
     const block = await this.inner.getBlockWithReceipts(blockNumber);
     this.blocks.set(blockNumber, block);
 

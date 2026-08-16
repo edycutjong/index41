@@ -64,7 +64,12 @@ export async function ensureCourt(
   wallet: Wallet,
   provider: JsonRpcApiProvider,
   log: (line: string) => void,
-  { fresh = false } = {},
+  /**
+   * `record: false` deploys without appending to `docs/deployment.json`. The benchmark stands up
+   * one throwaway court per trial — those are measurement scaffolding, not proven runs, and
+   * writing them into the deployment ledger would drown the three runs a judge actually reads.
+   */
+  { fresh = false, record = true } = {},
 ): Promise<{ deployment: Deployment; contract: Contract; freshlyDeployed: boolean }> {
   const existing = fresh ? null : readDeployment();
   if (existing && existing.chainId === CC3.chainId) {
@@ -97,7 +102,7 @@ export async function ensureCourt(
     deployedAt: new Date().toISOString(),
     explorer: `${CC3.explorer}/address/${address}`,
   };
-  appendDeployment(deployment);
+  if (record) appendDeployment(deployment);
   log(`Index41        ${address}  (deploy gas ${receipt!.gasUsed})`);
   log(`explorer       ${deployment.explorer}`);
 

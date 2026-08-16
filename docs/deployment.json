@@ -53,5 +53,27 @@
     "deployBlock": 5317818,
     "deployedAt": "2026-08-16T04:23:47.944Z",
     "explorer": "https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2"
+  },
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0xe6bdff1393d7b84835018509e3d3e10cfb711a847dba629a08683383301cc28b",
+    "deployBlock": 5319077,
+    "deployedAt": "2026-08-16T09:38:47.708Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d"
+  },
+  {
+    "network": "cc3-testnet",
+    "chainId": 102031,
+    "index41": "0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63",
+    "evmV1Decoder": "0x731c345d79Fb8BbDC541f9DF3b6317585F849F9f",
+    "deployer": "0x9436ed9Ac85F9e39A5AE44cd598651F272c45e24",
+    "deployTx": "0x4bcdb47c884e0f703a90ab783d525feacb472fbb49f70f0640eee707602471b3",
+    "deployBlock": 5319095,
+    "deployedAt": "2026-08-16T09:43:18.170Z",
+    "explorer": "https://creditcoin-testnet.blockscout.com/address/0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63"
   }
 ]

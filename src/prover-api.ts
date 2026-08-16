@@ -22,6 +22,7 @@
  */
 
 import { CC3 } from './config.js';
+import { surfaceWork } from './surfaces.js';
 
 export interface MerkleProofEntry {
   hash: string;
@@ -98,6 +99,7 @@ async function readError(res: Response): Promise<never> {
 export async function attestedHeight(chainKey: number, baseUrl: string = CC3.proverUrl): Promise<number> {
   const res = await fetch(`${baseUrl}/api/v1/attested-height/${chainKey}`);
   if (!res.ok) await readError(res);
+  surfaceWork('GET /api/v1/attested-height/{chain_key}');
   const body = (await res.json()) as { attestedHeight: number | null };
   if (body.attestedHeight == null) throw new Error(`chain key ${chainKey} reports no attested height`);
   return body.attestedHeight;
@@ -107,6 +109,7 @@ export async function attestedHeight(chainKey: number, baseUrl: string = CC3.pro
 export async function health(baseUrl: string = CC3.proverUrl) {
   const res = await fetch(`${baseUrl}/api/v1/health`);
   if (!res.ok) await readError(res);
+  surfaceWork('GET /api/v1/health');
   return (await res.json()) as {
     status: string;
     cc3_rpc_connected: boolean;
@@ -129,6 +132,7 @@ export async function proofBatchByIndex(
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) await readError(res);
+  surfaceWork('POST /api/v1/proof-batch/{chain_key}');
   return (await res.json()) as BatchedContinuityResponse;
 }
 
@@ -226,6 +230,9 @@ export async function probeRetriableContract(
       };
     }
     const body = err.body;
+    // The structured `ErrorResponse` came back, so `retriable` / `last_attested_block` are being
+    // read for real — that is the surface, and it is what the adaptive poller is built on.
+    surfaceWork('ErrorResponse.retriable / last_attested_block');
     return {
       honoured: body.retriable === true && body.last_attested_block != null,
       code: body.code,

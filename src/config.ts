@@ -9,6 +9,8 @@ import { join } from 'node:path';
 
 import { blockProver } from '@gluwa/usc-sdk';
 
+import { surfaceWork } from './surfaces.js';
+
 export const CC3 = {
   chainId: 102031,
   rpcUrl: 'https://rpc.cc3-testnet.creditcoin.network',
@@ -24,6 +26,7 @@ export const ETHEREUM_CHAIN_KEY = 3;
  * than retyped, so a protocol move relocates us for free.
  */
 export const VERIFIER_PRECOMPILE = blockProver.BLOCK_PROVER_PRECOMPILE_ADDRESS;
+surfaceWork('blockProver.BLOCK_PROVER_PRECOMPILE_ADDRESS');
 
 /**
  * Creditcoin's pre-deployed `EvmV1Decoder`. Its functions are `public`, so the library is an

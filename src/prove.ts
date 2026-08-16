@@ -54,6 +54,7 @@ import {
   fetchFromLadder,
 } from './proof-sources.js';
 import { attestedHeight, health, probeRetriableContract, waitForProvable } from './prover-api.js';
+import { formatSurfaceReport, surfaceConstructed, surfaceWork } from './surfaces.js';
 
 /** A bond big enough that the demo's harm is fully covered. Harm here is denominated in pool wei. */
 const MIN_BOND = 10n ** 18n; // 1 CTC
@@ -109,12 +110,40 @@ function fixtureHashes(): { hashes: string[]; note: string } {
   return { hashes: [s.frontRun.hash, s.victim.hash, s.backRun.hash], note: s.note };
 }
 
+/**
+ * Which of the runs this transcript is. `proveSandwich` burns its query ids, so each independent
+ * run needs its own court and therefore has its own contract address — and a judge arriving here
+ * straight from the README needs to be told, on line 4, that the address below is not the headline
+ * deployment. `docs/PIPELINE.md` tabulates all of them.
+ */
+const RUN_LABEL = killHosted
+  ? 'THE --kill-hosted RUN — the hosted proof service is switched off; the proof is rebuilt locally.'
+  : 'THE DEFAULT RUN — the hosted proof source answers first, as it does with no flags at all.';
+
+/**
+ * The tally that turns the README's surface table from an assertion into a measurement. Printed on
+ * every exit path, including the one where the replay guard refuses a second ruling.
+ */
+function reportSurfaces(): void {
+  log.rule('Attestcoin surface tally');
+  for (const line of formatSurfaceReport()) log.line(line);
+}
+
 // ------------------------------------------------------------------ main
 
 async function main() {
   log.line('index41 — THE PROVING PIPELINE');
   log.line('three Ethereum mainnet transaction hashes in, one Creditcoin ruling out');
   log.line(`run at ${new Date().toISOString()}`);
+  log.line(RUN_LABEL);
+  log.line(`invoked as: npm run prove${argv.length ? ' -- ' + argv.join(' ') : ''}`);
+  log.line(
+    'The Index41 address below is this run\'s own court, NOT the headline deployment — that one is ' +
+      'in docs/DEPLOYMENT.md, and docs/PIPELINE.md tabulates every proven run. A court that has ' +
+      'ruled is retired by the replay guard, so an independent run needs --fresh-court; that flag ' +
+      'deploys a court and touches no Attestcoin surface. --kill-hosted is the only flag that ' +
+      'changes which proof source answers.',
+  );
 
   // ---------------------------------------------------------------- 0. inputs
   log.rule('0. Input');
@@ -155,10 +184,15 @@ async function main() {
 
   const info = new chainInfo.PrecompileChainInfoProvider(cc3);
   const prover = new blockProver.PrecompileBlockProver(cc3);
+  surfaceConstructed('chainInfo.PrecompileChainInfoProvider');
+  surfaceConstructed('blockProver.PrecompileBlockProver');
 
+  surfaceWork('chainInfo.PrecompileChainInfoProvider');
+  surfaceWork('chainInfo.getSupportedChainByKey');
   const chain = await info.getSupportedChainByKey(ETHEREUM_CHAIN_KEY);
   assert(chain !== null, `chain key ${ETHEREUM_CHAIN_KEY} is not supported on this network`);
   assert(chain.chainId === 1, `chain key ${ETHEREUM_CHAIN_KEY} maps to chainId ${chain.chainId}, not mainnet`);
+  surfaceWork('chainInfo.getAttestationGenesisHeight');
   log.kv('source chain', `key ${ETHEREUM_CHAIN_KEY} → chainId ${chain.chainId} (attestation genesis ${await info.getAttestationGenesisHeight(ETHEREUM_CHAIN_KEY)})`);
 
   // ---------------------------------------------------------------- 2. positions
@@ -209,6 +243,7 @@ async function main() {
     log.line('hosted prover disabled — attestation is read straight off the chain-info precompile');
   }
 
+  surfaceWork('chainInfo.getLatestAttestedHeightAndHash');
   const tip = await info.getLatestAttestedHeightAndHash(ETHEREUM_CHAIN_KEY);
   log.line('');
   log.kv('attested tip', `${tip.height} ${tip.hash} (isAttestation=${tip.isAttestation})`);
@@ -225,6 +260,7 @@ async function main() {
   const behind = tip.height - blockNumber;
   const extraDelayMs = behind >= SETTLED_MARGIN ? 0 : 15_000;
   const t0 = Date.now();
+  surfaceWork('chainInfo.waitUntilHeightAttested');
   await info.waitUntilHeightAttested(ETHEREUM_CHAIN_KEY, blockNumber, 5_000, 60_000, extraDelayMs);
   log.kv(
     'waitUntilHeight',
@@ -241,6 +277,7 @@ async function main() {
     );
   }
 
+  surfaceWork('chainInfo.getContinuityBounds');
   const bounds = await info.getContinuityBounds(ETHEREUM_CHAIN_KEY, blockNumber);
   log.kv(
     'continuity',
@@ -352,6 +389,8 @@ async function main() {
   log.rule('7. Dry run — every verification, for free, before any gas is spent');
 
   for (const l of bundle.legs) {
+    surfaceWork('blockProver.PrecompileBlockProver');
+    surfaceWork('blockProver.verifySingle');
     const ok = await prover.verifySingle(
       ETHEREUM_CHAIN_KEY,
       blockNumber,
@@ -359,6 +398,7 @@ async function main() {
       l.merkleProof as never,
       bundle.continuityProof,
     );
+    surfaceWork('blockProver.computeTransactionIndex');
     const recovered = Number(await prover.computeTransactionIndex(l.merkleProof as never));
     log.line(
       `  ${l.role.padEnd(10)} verifySingle=${ok} · calculateTxIndex=${recovered} (mainnet says ${l.expectedIndex})`,
@@ -402,6 +442,7 @@ async function main() {
     log.line('The replay guard is doing its job — three per-leg query ids and the composite claim id');
     log.line('were all burned by that ruling, so nothing can claim it a second time here.');
     log.line('Run again with --fresh-court to have a new court rule on it independently.');
+    reportSurfaces();
     return;
   }
 
@@ -430,11 +471,17 @@ async function main() {
   log.line('the precompile\'s OWN event, once per verifyAndEmit — not our contract, not this script:');
   for (const i of result.verifiedIndices) log.line(`  TransactionVerified(chainKey=${ETHEREUM_CHAIN_KEY}, height=${blockNumber}, txIndex=${i})`);
   assert(result.verifiedIndices.length === 3, `expected 3 TransactionVerified logs, got ${result.verifiedIndices.length}`);
+  // Three TransactionVerified logs, emitted by the precompile itself, are the receipt's own proof
+  // that verifyAndEmit ran three times inside this one transaction.
+  surfaceWork('INativeQueryVerifier.verifyAndEmit');
   log.line('');
   for (const e of result.events) log.line(`  ${e.name}(${e.args.join(', ')})`);
 
   const proven = result.events.find((e) => e.name === 'SandwichProven');
   assert(proven !== undefined, 'no SandwichProven event in the receipt');
+  // SandwichProven carries the three ordinal positions, and the only thing on chain that can
+  // produce them is calculateTxIndex — so the event is the evidence for surface 35.
+  surfaceWork('INativeQueryVerifier.calculateTxIndex');
   log.line('');
   log.line(`  index ${f}   searcher buy     ${bundle.legs[0]!.hash}`);
   log.line(`  index ${v}   the victim       ${bundle.legs[1]!.hash}`);
@@ -444,6 +491,9 @@ async function main() {
   log.kv('contract', `${CC3.explorer}/address/${deployment.index41}`);
   log.line('');
   log.line('  Creditcoin read the position of a transaction inside an Ethereum block, and the bond paid.');
+
+  reportSurfaces();
+
   log.rule();
   log.line(`finished ${new Date().toISOString()}`);
   log.line(`evidence written to ${relative(REPO_ROOT, OUTPUT)}`);

@@ -22,6 +22,7 @@ import { utils } from '@gluwa/usc-sdk';
 import { EVM_V1_DECODER, VERIFIER_PRECOMPILE } from './config.js';
 import type { ProofBundle } from './proof-sources.js';
 import { readArtifact } from './artifacts.js';
+import { surfaceWork } from './surfaces.js';
 
 /** `Swap(address,uint256,uint256,uint256,uint256,address)` — Uniswap V2 and every fork of it. */
 export const UNISWAP_V2_SWAP = id('Swap(address,uint256,uint256,uint256,uint256,address)');
@@ -104,6 +105,10 @@ export async function decodeLeg(
   txBytes: string,
   trackGas = false,
 ): Promise<DecodedLeg> {
+  // One `eth_call` into Creditcoin's deployed EvmV1Decoder — the same library address Index41
+  // links against on chain, so the preflight decode is the decode the contract will perform.
+  surfaceWork('utils.decoder.decodeEvmV1Transaction');
+  surfaceWork('EvmV1Decoder (deployed library)');
   const decoded = await utils.decoder.decodeEvmV1Transaction(txBytes, decoder, { trackGas });
   const { commonTx, receipt } = decoded.data;
   const caps = feeCaps(decoded);
@@ -287,6 +292,7 @@ export interface GasBudget {
  * `Number`'s exact-integer range, so this is exact, not an approximation.
  */
 function exactPercentOfMax(gas: bigint): number {
+  surfaceWork('utils.gas.MAX_GAS_CAP');
   return (Number(gas) / Number(utils.gas.MAX_GAS_CAP)) * 100;
 }
 
@@ -303,8 +309,12 @@ export async function budgetGas(
   from: string,
   continuityLength: number,
 ): Promise<GasBudget> {
+  surfaceWork('utils.gas.computeGasLimit');
   const computedLimit = await utils.gas.computeGasLimit(rpc, contract, calldata, from, continuityLength);
+  surfaceWork('utils.gas.MAX_GAS_CAP');
   const cappedLimit = computedLimit > utils.gas.MAX_GAS_CAP ? utils.gas.MAX_GAS_CAP : computedLimit;
+  surfaceWork('utils.hex.bytesInHexString');
+  surfaceWork('utils.gas.gasAsPercentageOfMax');
   return {
     calldataBytes: utils.hex.bytesInHexString(calldata),
     computedLimit,

@@ -39,6 +39,7 @@ import {
   leg as legOf,
   proofBatchByIndex,
 } from './prover-api.js';
+import { surfaceConstructed, surfaceWork } from './surfaces.js';
 
 /** One transaction we want proven, named the way the claimant names it. */
 export interface LegRequest {
@@ -145,11 +146,16 @@ export class HostedByHashSource implements ProofSource {
 
   constructor(chainKey: number, baseUrl: string = CC3.proverUrl) {
     this.builder = new proofProvider.service.ProofBuilder(chainKey, baseUrl);
+    // Rung 2 is BUILT on every run and QUERIED only when rung 1 cannot answer. That distinction is
+    // exactly why the honest default-run count is 30 and not 36.
+    surfaceConstructed('proofProvider.service.ProofBuilder');
     this.trusts = `${baseUrl} — POST /api/v1/proof-batch-by-tx/{chain_key}, via the SDK client`;
   }
 
   async fetch(chainKey: number, blockNumber: number, legs: LegRequest[]): Promise<ProofBundle> {
     const t0 = Date.now();
+    surfaceWork('proofProvider.service.ProofBuilder');
+    surfaceWork('proofProvider.service.ProofBuilder.getBatchProof');
     const result = await this.builder.getBatchProof(legs.map((l) => l.hash));
     if (!result.success || !result.data) throw new Error(result.error ?? 'getBatchProof returned no data');
     const data = result.data;
@@ -207,6 +213,11 @@ export class LocalRawSource implements ProofSource {
       new chainInfo.PrecompileChainInfoProvider(cc3Rpc),
       encoding.EncodingVersion.V1,
     );
+    // Same story as rung 2: built on every run, asked a question only when the hosted rungs are
+    // gone. `--kill-hosted` is what turns these three from `constructed` into `work`.
+    surfaceConstructed('proofProvider.raw.RawProofBuilder');
+    surfaceConstructed('chainInfo.PrecompileChainInfoProvider');
+    surfaceConstructed('encoding.EncodingVersion');
     this.trusts = 'an Ethereum RPC + the Creditcoin chain-info precompile. No proof service.';
   }
 
@@ -223,8 +234,10 @@ export class LocalRawSource implements ProofSource {
     const t0 = Date.now();
     const found = new Map<number, Omit<ProvenLegProof, keyof LegRequest>>();
     let shared: ContinuityProof | null = null;
+    surfaceWork('proofProvider.raw.RawProofBuilder');
 
     for (const l of legs) {
+      surfaceWork('proofProvider.raw.RawProofBuilder.getProof');
       const result = await this.builder.getProof(l.hash);
       if (!result.success || !result.data) throw new Error(`${l.role}: ${result.error ?? 'no data'}`);
       const d = result.data;

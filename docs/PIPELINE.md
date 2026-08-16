@@ -32,9 +32,14 @@ produces the same merkle root, byte for byte.
 
 | Run | Proof source | Index41 | CC3 transaction | Gas |
 |---|---|---|---|---|
-| **live deployment** — see [`DEPLOYMENT.md`](DEPLOYMENT.md) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) **(source verified)** | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) | 1,092,100 (1.456% of cap) |
-| default | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0x2084C677…82DDD`](https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD) | [`0x53ac43ed…03b8b`](https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b) | 1,092,100 (1.456% of cap) |
-| `--kill-hosted` | `RawProofBuilder` — **no proof service at all** | [`0xc5F604B7…66C33`](https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33) | [`0xb95466d9…16fb2`](https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2) | 1,092,100 (1.456% of cap) |
+| **live deployment** — the headline, see [`DEPLOYMENT.md`](DEPLOYMENT.md) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) **(source verified)** | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) | 1,092,100 (1.456% of cap) |
+| default — [`pipeline-output.txt`](pipeline-output.txt) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xBA3b9f7C…8C17d`](https://creditcoin-testnet.blockscout.com/address/0xBA3b9f7C2e6F61eF38C395aaFd8a4df2dA28C17d) | [`0xddee0f3f…88f58d`](https://creditcoin-testnet.blockscout.com/tx/0xddee0f3f370d9834ab1bd87c5b10c24436895ddb014a19d85591e4d84088f58d) | 1,092,100 (1.456% of cap) |
+| `--kill-hosted` — [`pipeline-output-local-prover.txt`](pipeline-output-local-prover.txt) | `RawProofBuilder` — **no proof service at all** | [`0x54cfF9e7…848c63`](https://creditcoin-testnet.blockscout.com/address/0x54cfF9e7BDdf044868B2ba7e5e212f8E79848c63) | [`0x7de4c750…e92455`](https://creditcoin-testnet.blockscout.com/tx/0x7de4c750210e36aea9eca97995172122f76c3dbb51df14436a674db4f4e92455) | 1,092,100 (1.456% of cap) |
+
+A court that has ruled is retired by the replay guard — `proveSandwich` burns three per-leg query
+ids plus a composite claim id — so each independent run deploys its own court with `--fresh-court`.
+That flag touches no Attestcoin surface. Earlier courts that produced the same ruling on the same
+sandwich are all in [`deployment.json`](deployment.json).
 
 Both runs emitted, from the precompile itself:
 
@@ -117,7 +122,9 @@ both on the default path:
 - **`extraDelayMs`.** `waitUntilHeightAttested`'s fifth parameter defaults to `15000`: after seeing
   the height attested it sleeps a flat fifteen seconds "to ensure data availability", whether the
   block was attested one second ago or three hours ago. No official example passes it. index41
-  passes `0` once the block is more than 256 below the attested tip. Measured: **15,269 ms → 317 ms**.
+  passes `0` once the block is more than 256 below the attested tip. In the committed transcripts
+  the call returns in **343 ms** (default) and **265 ms** (`--kill-hosted`) instead of the ~15 s the
+  SDK default would have spent — the transcripts print the arithmetic on the line itself.
 - **`ErrorResponse.retriable` + `last_attested_block`.** Every run first asks the prover for a
   height it cannot serve, to confirm it honours that contract before the poller relies on it:
 
@@ -161,8 +168,22 @@ The official-example baseline is **3 methods on 2 classes** (`ProofBuilder` ctor
 **36 distinct surfaces, 24 of them undocumented.** On a clean default run **30 do real work**; all 36
 across the default and `--kill-hosted` runs. "Undocumented" means absent from docs.creditcoin.org.
 
-The gap is the proof ladder. On a default run rung 1 answers in 619 ms, so rungs 2 and 3 are built
-but never asked a question. Checkable line by line against `pipeline-output.txt`:
+The gap is the proof ladder. On a default run rung 1 answers first — 1,200 ms in the committed
+transcript, p50 in [`../DEMO.md`](../DEMO.md#full-results) — so rungs 2 and 3 are built and never
+asked a question.
+
+**This is no longer a claim you have to take from a table.** `npm run prove` counts the surfaces as
+it exercises them and prints the tally, by name, into the transcript it commits:
+
+```
+ATTESTCOIN SURFACES EXERCISED THIS RUN: 30
+  30 did real work · 3 constructed but never queried · 3 not reached · 36 catalogued
+```
+
+`--kill-hosted` prints **32** — the same run with the standby rungs forced to answer and the four
+proof-gen HTTP surfaces unreachable. The union of the two runs is all 36 — 30 of them on the
+default path — and the counter (`src/surfaces.ts`) throws on an id that is not in the 36-row
+catalogue, so the number cannot be padded. Checkable line by line against `pipeline-output.txt`:
 
 | On a zero-flag `npm run prove` | Count | Which |
 |---|---:|---|
@@ -180,8 +201,8 @@ rows agree, zero disagreements, zero symbols missing from the ledger**. The ledg
 and these rows carry its verdicts. The four proof-gen HTTP endpoints fall outside that ledger's SDK
 scope and are classified here against the prover's own published OpenAPI spec and the docs site;
 `POST /api/v1/proof-batch/{chain_key}` and the `ErrorResponse` fields appear in neither the docs site
-nor any SDK binding, hence undocumented. The totals reconcile at **36 / 24 / 12 documented**, and
-`README.md` states the identical numbers.
+nor any SDK binding, hence undocumented. The totals reconcile at **36 / 24 / 12 documented, with
+30 of the 36 doing real work on a default run**, and `README.md` states the identical numbers.
 
 ### `chainInfo`
 
