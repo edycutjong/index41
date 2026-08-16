@@ -1,0 +1,124 @@
+name: release
+
+# Automatic semantic versioning from the commit log.
+#
+# The version is DERIVED, never hand-typed: scripts/next-version.mjs reads the
+# commits since the last v*.*.* tag, maps them through this repository's own
+# commit types (a stock Conventional Commits config would be wrong here — the log
+# is mostly `docs:`, `prove:`, `bench:`, `meta:` and `deploy:`, which stock rules
+# do not know), and prints the next version plus grouped release notes.
+#
+# Deliberately no third-party actions. This is the only workflow holding
+# `contents: write`, and a marketplace action added here would inherit that token
+# unpinned — in a repository that already runs CodeQL and gitleaks over its own
+# source. Everything below is `actions/checkout`, node, and `gh`, which is
+# preinstalled on the runner.
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Compute the next version and print it, but do not tag or release"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # never let two releases race for the same tag
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Skip the commit this workflow itself pushes, or it would release forever.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      !startsWith(github.event.head_commit.message, 'chore(release):')
+    permissions:
+      contents: write # create the tag, push the version bump, cut the release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the whole log — the bump is derived from it
+          # persist-credentials is needed to push the version-bump commit back
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Derive the next version
+        id: v
+        run: node scripts/next-version.mjs --github
+
+      - name: Report
+        run: |
+          echo "### Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- bump: \`${{ steps.v.outputs.bump }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- next: \`${{ steps.v.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- releasing: \`${{ steps.v.outputs.should_release }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Nothing to release
+        if: steps.v.outputs.should_release != 'true'
+        run: echo "No releasable commits since the last tag — stopping here."
+
+      - name: Dry run
+        if: >-
+          steps.v.outputs.should_release == 'true' &&
+          github.event_name == 'workflow_dispatch' &&
+          inputs.dry_run
+        run: |
+          echo "DRY RUN — would tag ${{ steps.v.outputs.tag }}"
+          echo "${{ steps.v.outputs.notes }}"
+
+      - name: Tag, bump and release
+        if: >-
+          steps.v.outputs.should_release == 'true' &&
+          !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.v.outputs.version }}
+          TAG: ${{ steps.v.outputs.tag }}
+          NOTES: ${{ steps.v.outputs.notes }}
+        run: |
+          set -euo pipefail
+
+          # Refuse to move an existing tag — releases are append-only.
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::$TAG already exists; refusing to overwrite a published release."
+            exit 1
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Keep package.json in step with the tag. `npm version` would also tag,
+          # so the write is done directly and committed here.
+          node -e '
+            const fs = require("fs");
+            const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            p.version = process.env.VERSION;
+            fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
+          '
+
+          printf '%s\n' "$NOTES" > /tmp/notes.md
+
+          if ! git diff --quiet package.json; then
+            git add package.json
+            git commit -m "chore(release): $TAG [skip ci]"
+            git push origin HEAD:main
+          fi
+
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "$TAG"
+
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes-file /tmp/notes.md \
+            --verify-tag

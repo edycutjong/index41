@@ -16,7 +16,7 @@
 
   <br/>
 
-  [![Live demo](https://img.shields.io/badge/▶️_Live_demo-index41-0ea5e9?style=for-the-badge)](https://index41-lovat.vercel.app)
+  [![Live demo](https://img.shields.io/badge/▶️_Live_demo-index41-0ea5e9?style=for-the-badge)](https://index41.edycu.dev)
   [![Judge in 30 seconds](https://img.shields.io/badge/⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![The ruling on Blockscout](https://img.shields.io/badge/⛓️_The_ruling-on_Blockscout-22c55e?style=for-the-badge)](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810)
   [![The proof pipeline](https://img.shields.io/badge/🔬_The-proof_pipeline-f59e0b?style=for-the-badge)](docs/PIPELINE.md)
@@ -111,6 +111,13 @@ entire foundation of this contract, and it is the one thing nothing else here ca
 
 ## 🏗️ Architecture & Tech Stack
 
+<div align="center">
+  <img src="docs/architecture.svg" alt="index41 architecture — a real Ethereum mainnet block is re-encoded and re-folded off-chain, its continuity proof chained to a Creditcoin checkpoint, then one Creditcoin transaction verifies three transactions, recovers each ordinal position from merkle-path laterality, asserts front is before victim is before back, derives harm from proven Swap logs, and pays the victim from the relay's bond" width="100%">
+</div>
+
+<details>
+<summary>The same flow as plain text (for terminals, and for anyone whose renderer blocks images)</summary>
+
 ```
   Ethereum mainnet                    Creditcoin CC3
   block 25,764,741                    (chainId 102031)
@@ -128,6 +135,8 @@ entire foundation of this contract, and it is the one thing nothing else here ca
                                            └─ pay victim from the relay's CTC bond
                                                  → SandwichProven · HarmPaid
 ```
+
+</details>
 
 Off-chain, the proving pipeline never trusts the party that served it a proof: every bundle is
 re-encoded from mainnet, re-folded leaf → root, and its continuity proof chained down to a
@@ -434,7 +443,7 @@ no `.env`, no wallet, no API key and no account on the default path.
 ### Installation
 
 ```bash
-git clone --recurse-submodules <repo-url>   # lib/forge-std is a submodule; only `npm test` needs it
+git clone --recurse-submodules <repo-url>  # lib/forge-std is a submodule; only `npm test` needs it
 npm install
 npm run dev                    # http://localhost:3000  ·  /judge for the one-page argument
 ```
@@ -453,9 +462,9 @@ The full on-chain run needs a funded CC3 key at `~/.config/creditcoin/index41-te
 is read at runtime and is **never** in this repository:
 
 ```bash
-npm run build:cc3                              # links Index41 against Creditcoin's deployed EvmV1Decoder
-npm run prove -- --fresh-court                 # deploy → bond → declare coverage → prove → pay, on CC3
-npm run prove -- --kill-hosted --fresh-court   # the same ruling, with the hosted prover switched off
+npm run build:cc3                             # links Index41 against Creditcoin's deployed EvmV1Decoder
+npm run prove -- --fresh-court                # deploy → bond → declare coverage → prove → pay, on CC3
+npm run prove -- --kill-hosted --fresh-court  # the same ruling, with the hosted prover switched off
 ```
 
 No flags are required and **none of them switch the judged capability on or off** — `--kill-hosted`

@@ -12,7 +12,7 @@ and a number there ever disagree, the page is right — it read the chain; this 
 
 ## The 30-second path
 
-1. Open the demo surface — **https://index41-lovat.vercel.app** — or run it yourself with
+1. Open the demo surface — **https://index41.edycu.dev** — or run it yourself with
    `npm install && npm run dev` → `http://localhost:3000`. Scroll to the ledger. Three rows of a real Ethereum mainnet block light up in sequence.
 2. Read the banner above the ledger. It names which of the **two real sources** is on screen right
    now — `LIVE CHAIN READ` or `CACHED REAL PROOF`. There is no third source and no mock.
