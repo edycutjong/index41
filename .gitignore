@@ -10,8 +10,8 @@ docs/assets
 
 # node / foundry / scratch
 scratch/
-out/
-cache/
-lib/
-broadcast/
+/out/
+/cache/
+/lib/
+/broadcast/
 *.log
