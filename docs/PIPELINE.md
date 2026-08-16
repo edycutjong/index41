@@ -32,6 +32,7 @@ produces the same merkle root, byte for byte.
 
 | Run | Proof source | Index41 | CC3 transaction | Gas |
 |---|---|---|---|---|
+| **live deployment** — see [`DEPLOYMENT.md`](DEPLOYMENT.md) | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0xb37Bc52b…10eC2`](https://creditcoin-testnet.blockscout.com/address/0xb37Bc52b9d6f7431Ba8Be4deD4f53281Efb10eC2) **(source verified)** | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) | 1,092,100 (1.450% of cap) |
 | default | `POST /api/v1/proof-batch/3` (hosted, by block position) | [`0x2084C677…82DDD`](https://creditcoin-testnet.blockscout.com/address/0x2084C677901067f15c59C48beFeb168b26982DDD) | [`0x53ac43ed…03b8b`](https://creditcoin-testnet.blockscout.com/tx/0x53ac43edb920c0fb5c45387e5488248696801bfa907e57402d53b3dfa6703b8b) | 1,092,100 (1.450% of cap) |
 | `--kill-hosted` | `RawProofBuilder` — **no proof service at all** | [`0xc5F604B7…66C33`](https://creditcoin-testnet.blockscout.com/address/0xc5F604B76240dc606509e1319d8B30D518566C33) | [`0xb95466d9…16fb2`](https://creditcoin-testnet.blockscout.com/tx/0xb95466d9b7c790d51a6457af9db13de88f5477091b47d005949ebce1b9516fb2) | 1,092,100 (1.450% of cap) |
 
@@ -45,7 +46,8 @@ SandwichProven(0x11111215…3911, 25764741, 14, 15, 16, 219708, 219708)
 HarmPaid(0x51f400b9…1410, 0x9436ed9A…5e24, 219708)
 ```
 
-Full transcripts: [`pipeline-output.txt`](pipeline-output.txt),
+Full transcripts: [`pipeline-output-deployment.txt`](pipeline-output-deployment.txt) (the live
+deployment), [`pipeline-output.txt`](pipeline-output.txt),
 [`pipeline-output-local-prover.txt`](pipeline-output-local-prover.txt),
 [`pipeline-output-replay.txt`](pipeline-output-replay.txt) (the replay guard refusing a second
 ruling on the same sandwich). Contract addresses: [`deployment.json`](deployment.json).
