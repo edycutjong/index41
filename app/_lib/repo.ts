@@ -64,14 +64,26 @@ export interface CiInfo {
 }
 
 /**
- * The most recent COMPLETED run of ci.yml on main. Completed only: an in-flight run has a null
- * conclusion, and reporting that as anything other than "no answer yet" would be a guess.
+ * Conclusions that are a statement about the CODE. `cancelled` and `skipped` are statements about
+ * the WORKFLOW — ci.yml runs under a cancel-in-progress concurrency group, so any two pushes close
+ * together leave the earlier run `cancelled`. Reporting that as the build state renders "ci
+ * cancelled" on the landing page, which reads as a broken build when nothing is broken.
+ */
+const CONCLUSIVE = new Set(['success', 'failure', 'timed_out']);
+
+/**
+ * The most recent CONCLUSIVE run of ci.yml on main.
+ *
+ * Completed runs only — an in-flight run has a null conclusion, and reporting that as anything but
+ * "no answer yet" would be a guess. The API cannot filter on "success OR failure" in one query, so
+ * this pulls a short page and takes the first conclusive entry. If the whole page is cancelled or
+ * skipped, it returns null and the badge is simply absent, which is the honest answer.
  */
 export async function latestCi(): Promise<CiInfo | null> {
   const d = await ghJson<{
     workflow_runs?: Array<{ conclusion?: string | null; html_url?: string }>;
-  }>('/actions/workflows/ci.yml/runs?branch=main&status=completed&per_page=1');
-  const run = d?.workflow_runs?.[0];
+  }>('/actions/workflows/ci.yml/runs?branch=main&status=completed&per_page=10');
+  const run = d?.workflow_runs?.find((r) => r.conclusion && CONCLUSIVE.has(r.conclusion));
   if (!run?.conclusion || !run.html_url) return null;
   return { conclusion: run.conclusion, url: run.html_url };
 }
