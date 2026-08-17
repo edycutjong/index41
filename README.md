@@ -22,7 +22,14 @@
   [![Demo video](https://img.shields.io/badge/▶️_Demo_video-2_min_55-ff0000?style=for-the-badge)](https://youtu.be/NuyoosaD-lk)
   [![The ruling on Blockscout](https://img.shields.io/badge/⛓️_The_ruling-on_Blockscout-22c55e?style=for-the-badge)](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810)
   [![The proof pipeline](https://img.shields.io/badge/🔬_The-proof_pipeline-f59e0b?style=for-the-badge)](docs/PIPELINE.md)
-  [![Built for BUIDL CTC 2026 Fall](https://img.shields.io/badge/DoraHacks-BUIDL_CTC_2026_Fall-8b5cf6?style=for-the-badge)](https://dorahacks.io/hackathon/buidl-ctc-2026-fall)
+  [![BUIDL 47994 — BUIDL CTC 2026 Fall](https://img.shields.io/badge/DoraHacks-BUIDL_47994-8b5cf6?style=for-the-badge)](https://dorahacks.io/buidl/47994)
+
+  <br/>
+
+  [![CI](https://github.com/edycutjong/index41/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/edycutjong/index41/actions/workflows/ci.yml)
+  [![CodeQL](https://github.com/edycutjong/index41/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/edycutjong/index41/actions/workflows/codeql.yml)
+  [![Release](https://img.shields.io/github/v/release/edycutjong/index41?sort=semver&color=22c55e)](https://github.com/edycutjong/index41/releases/latest)
+  [![Hackathon](https://img.shields.io/badge/Hackathon-BUIDL_CTC_2026_Fall-8b5cf6?style=flat)](https://dorahacks.io/hackathon/buidl-ctc-2026-fall)
 
   <br/>
 

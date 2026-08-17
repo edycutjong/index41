@@ -26,7 +26,8 @@ export async function RepoBadges() {
           target="_blank"
           rel="noreferrer noopener"
           className="rounded-sm transition-opacity hover:opacity-80"
-          aria-label={`Latest release ${release.tag} on GitHub`}
+          // Same rule as the CI badge below: leads with the visible text ("release v1.2.3").
+          aria-label={`release ${release.tag} — latest release on GitHub`}
         >
           <Badge tone="claimed">
             <Tag className="h-3 w-3" aria-hidden />
@@ -41,7 +42,10 @@ export async function RepoBadges() {
           target="_blank"
           rel="noreferrer noopener"
           className="rounded-sm transition-opacity hover:opacity-80"
-          aria-label={`Continuous integration on main is ${passing ? 'passing' : ci.conclusion}`}
+          // The accessible name must CONTAIN the visible text ("ci passing"), or voice-control
+          // users cannot activate the control by reading it aloud. Lighthouse caught the earlier
+          // wording ("Continuous integration on main is passing") as label-content-name-mismatch.
+          aria-label={`ci ${passing ? 'passing' : ci.conclusion} — continuous integration on main`}
         >
           {/* `live` is the success tone; anything that is not a pass is reported as it is, not
               softened — the page argues for verifiable claims, so a red build says red. */}
