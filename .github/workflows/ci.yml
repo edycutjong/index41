@@ -4,9 +4,9 @@ name: CI/CD Pipeline
 #   contracts/  Solidity, built and tested with Foundry
 #   src/        a TypeScript proving pipeline (Node)
 #   app/        a Next.js 16 demo surface
-# All three are gated below. A green run means the contracts compile and pass 120 unit tests, the
-# TypeScript typechecks and lints clean, the site builds, the E2E suite passes against a real
-# production server, and no secret is present anywhere in the history.
+# All three are gated below. A green run means the contracts compile, pass 144 unit tests at a
+# gated coverage floor, the TypeScript typechecks and lints clean, the site builds, the E2E suite
+# passes against a real production server, and no secret is present anywhere in the history.
 
 on:
   push:
@@ -55,8 +55,88 @@ jobs:
       - name: Build contracts
         run: forge build --sizes
 
-      - name: Unit tests (120 across 4 suites)
+      - name: Unit tests (144 across 6 suites)
         run: forge test --summary
+
+      # Coverage floor is set from the ACTUAL measured baseline (forge coverage --no-match-coverage
+      # "script", 144/144 passing), a hair below each real number so lcov's own float formatting
+      # can't flap the gate red on a no-op run. Two items keep contracts/src/ off 100% and both are
+      # investigated, not neglected:
+      #   - Index41.sol:572 — `if (processedQueries[claimId]) revert QueryAlreadyProcessed(claimId)`
+      #     inside `_record`. Unreachable from any external call: the per-leg queryIds are burned in
+      #     `_proveLeg` before `_record` runs, so the per-leg replay guard always fires first. The
+      #     only way to hit this line is vm.store-poking `processedQueries[claimId] = true`, which
+      #     fabricates a state no legitimate call path can produce — not a test worth having.
+      #   - INativeQueryVerifier.sol — forge reports 50% "statements" (1/2) on a pure interface
+      #     with no function bodies; lcov's own LF/LH show 2/2 lines and 0/0 branches, both
+      #     covered. There is nothing executable behind the missing "statement" to test.
+      # If a real regression drops these numbers, RAISE test coverage to fix it — do not lower the
+      # gate to match. If the tracked baseline itself moves, update the *_MIN constants below in
+      # the same commit as the tests that moved it, with the new `forge coverage` numbers in the
+      # commit body.
+      - name: Coverage gate (forge coverage, lcov + summary)
+        run: |
+          set -euo pipefail
+
+          forge coverage --no-match-coverage "script" \
+            --report summary --report lcov --report-file lcov.info \
+            | tee coverage-summary.txt
+
+          TOTAL_LINE=$(grep '^| Total' coverage-summary.txt)
+          read -r LINES STATEMENTS BRANCHES FUNCS <<< "$(grep -oE '[0-9]+\.[0-9]+' <<< "$TOTAL_LINE" | tr '\n' ' ')"
+
+          # Measured 2026-08-17: 99.75% lines (401/402) · 99.55% statements (445/447) ·
+          # 98.59% branches (70/71) · 100.00% functions (63/63).
+          LINES_MIN=99.74
+          STATEMENTS_MIN=99.54
+          BRANCHES_MIN=98.58
+          FUNCS_MIN=100.00
+
+          fail=0
+          check() {
+            local name="$1" actual="$2" min="$3"
+            if awk -v a="$actual" -v m="$min" 'BEGIN { exit !(a + 0 < m + 0) }'; then
+              echo "::error::${name} coverage ${actual}% is below the ${min}% gate"
+              fail=1
+            else
+              echo "${name}: ${actual}% >= ${min}% gate — ok"
+            fi
+          }
+          check "Lines"      "$LINES"      "$LINES_MIN"
+          check "Statements" "$STATEMENTS" "$STATEMENTS_MIN"
+          check "Branches"   "$BRANCHES"   "$BRANCHES_MIN"
+          check "Functions"  "$FUNCS"      "$FUNCS_MIN"
+
+          {
+            echo "### 🧪 Foundry coverage — \`contracts/src/\`"
+            echo
+            echo "\`forge coverage --no-match-coverage \"script\"\` (144 tests):"
+            echo
+            echo '```'
+            cat coverage-summary.txt
+            echo '```'
+            echo
+            echo "Gate: lines ≥ ${LINES_MIN}% · statements ≥ ${STATEMENTS_MIN}% · branches ≥ ${BRANCHES_MIN}% · functions ≥ ${FUNCS_MIN}%"
+            echo
+            echo "Two items keep \`contracts/src/\` off a clean 100%, both investigated and left on purpose:"
+            echo "- \`Index41.sol:572\` — the claim-level replay guard in \`_record\`, unreachable because the"
+            echo "  per-leg replay guard in \`_proveLeg\` always burns the query id first."
+            echo "- \`INativeQueryVerifier.sol\` — forge's \"statements\" counter reports 1/2 on a pure interface"
+            echo "  with no instrumentable bytecode; lcov's own line/branch counts are 100%."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$fail" -eq 1 ]; then
+            echo "::error::Coverage regressed below the gated floor — see job summary for the full table."
+            exit 1
+          fi
+
+      - name: Upload lcov report
+        uses: actions/upload-artifact@v7
+        with:
+          name: forge-lcov-report
+          path: lcov.info
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Gas report
         run: forge test --gas-report > gas-report.txt || true
@@ -264,7 +344,7 @@ jobs:
         run: |
           echo "🚀 All CI/CD gates passed."
           echo ""
-          echo "  ✅ Stage 1 — Contracts:  forge fmt --check, forge build, 120 forge tests"
+          echo "  ✅ Stage 1 — Contracts:  forge fmt --check, forge build, 144 forge tests, coverage gate"
           echo "  ✅ Stage 1 — App:        ESLint (0 warnings), tsc --noEmit, Node 20/22/24"
           echo "  ✅ Stage 2 — Secrets:    gitleaks (full history) + TruffleHog"
           echo "  ✅ Stage 2 — Deps:       npm audit (production tree, blocking) + licences"
