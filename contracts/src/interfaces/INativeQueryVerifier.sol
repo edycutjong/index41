@@ -51,7 +51,21 @@ library NativeQueryVerifierLib {
     /// @dev 4050 decimal.
     address internal constant PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000FD2;
 
-    function getVerifier() internal pure returns (INativeQueryVerifier) {
-        return INativeQueryVerifier(PRECOMPILE_ADDRESS);
+    /**
+     * @dev Named return rather than `return INativeQueryVerifier(PRECOMPILE_ADDRESS);`. The two
+     *      compile to byte-identical runtime bytecode — verified on both concrete contracts,
+     *      Index41 and OrderProbe, with the CBOR metadata trailer stripped — so this is purely
+     *      about how `forge coverage` counts.
+     *
+     *      The explicit-return form registers TWO statements on one line: the return itself, and
+     *      the nested cast `INativeQueryVerifier(PRECOMPILE_ADDRESS)`. Casting a constant address
+     *      to an interface type emits no bytecode, so that inner statement has no instruction to
+     *      hit and reports 0 hits forever. It was the single item keeping the repository off
+     *      100% statement coverage, and no test could ever have reached it.
+     *
+     *      Do not "tidy" this back to an explicit return without re-checking `forge coverage`.
+     */
+    function getVerifier() internal pure returns (INativeQueryVerifier verifier) {
+        verifier = INativeQueryVerifier(PRECOMPILE_ADDRESS);
     }
 }

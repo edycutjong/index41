@@ -34,7 +34,7 @@ export async function Hero({ view }: { view: ProofView }) {
       note: `one block, ${view.source.transactionCount} transactions`,
     },
     {
-      figure: '144',
+      figure: '145',
       label: 'Foundry tests, all passing',
       note: 'npm test — forge test --summary',
     },

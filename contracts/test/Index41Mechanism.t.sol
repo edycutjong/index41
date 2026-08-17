@@ -151,4 +151,35 @@ contract Index41MechanismTest is Index41Base {
         (bool ok,) = address(court).call{value: 1 ether}("");
         assertFalse(ok, "ether with no relay to credit has nowhere to go");
     }
+
+    // -----------------------------------------------------------------------------------
+    // Defence in depth
+    // -----------------------------------------------------------------------------------
+
+    /// @dev `_record` re-checks the COMPOSITE claim id even though the three per-leg ids burned
+    ///      in `_proveLeg` already make a repeat impossible. That second lock is unreachable
+    ///      through the public API by construction — `test_TheSameSandwichCannotBeClaimedTwice`
+    ///      shows a resubmission dying on the per-leg id (14) long before `_record` runs — so
+    ///      the only way to exercise it is to forge the state it defends against: seed the
+    ///      composite id while leaving every per-leg id untouched, which no caller can do.
+    ///
+    ///      This is the one test in the suite that writes storage directly, and it is why the
+    ///      contract reaches 100% line and branch coverage without deleting the lock. If it
+    ///      ever fails because no revert fired, "one sandwich, one payout" has stopped being
+    ///      defended twice and is resting on the per-leg burn alone.
+    function test_TheCompositeClaimIdIsASecondLock() public {
+        Index41.Claim memory c = _claim(_defaults());
+        bytes32 claimId = court.claimIdFor(c.chainKey, c.blockHeight, c.legs[0].merkleRoot, 14, 15, 16);
+
+        // processedQueries is slot 0 — `forge inspect Index41 storage-layout`.
+        vm.store(address(court), keccak256(abi.encode(claimId, uint256(0))), bytes32(uint256(1)));
+        assertTrue(court.processedQueries(claimId), "precondition: the composite id reads as spent");
+        assertFalse(
+            court.processedQueries(queryId(CHAIN_KEY_MAINNET, HEIGHT, 14)),
+            "precondition: no per-leg id was seeded, so the first lock cannot be what fires"
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(Index41.QueryAlreadyProcessed.selector, claimId));
+        court.proveSandwich(c);
+    }
 }

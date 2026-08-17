@@ -52,7 +52,7 @@ Every row was read from the chain, not asserted.
 | Ordering assertion | `front 14 < victim 15 < back 16` — holds |
 | Harm paid from the bond | `219,708` wei → `0x51f400…6a1410`, the address the *proof* says was sandwiched. Paid == computed. |
 | Gas | `1,092,100` — **1.456%** of `MAX_GAS_CAP` (75,000,000), for 3× `verifyAndEmit` + 3× `calculateTxIndex` + the ordering assert + the events |
-| Contract tests | **144** Foundry unit tests across 6 suites, 0 failed |
+| Contract tests | **145** Foundry unit tests across 6 suites, 0 failed |
 | E2E tests | **54** Playwright tests (chromium + mobile), zero config |
 | Exhaustive verification | **256 positions** — every leaf of the depth-8 tree round-tripped through the laterality decoder in `test_TxIndexOfRoundTripsEveryPositionInTheTree` |
 | Attestcoin depth | **36 surfaces** made load-bearing, **24 undocumented**; **30** do real work on a clean default run (3 more are constructed but never queried), all 36 across the default and `--kill-hosted` runs. The official examples exercise **3**. **Counted by the run itself** — `npm run prove` prints `ATTESTCOIN SURFACES EXERCISED THIS RUN: 30` and names all 36, into `docs/pipeline-output.txt`. |
@@ -75,7 +75,7 @@ node scripts/capture-proof.mjs --check
 
 # the contract suite (needs the forge-std submodule: clone with --recurse-submodules,
 # or run `git submodule update --init` once — nothing else here does)
-npm test                              # forge test --summary — 144 tests, 6 suites
+npm test                              # forge test --summary — 145 tests, 6 suites
 
 # the E2E suite (needs a build first)
 npm run build && npm run e2e          # 54 tests
@@ -117,7 +117,7 @@ Disclosed rather than discovered:
   contract rules on them. `scripts/find-sandwich.ts` finds real ones off-chain.
 - **One bonded relay, one ruling.** A multi-relay registry and a historical-claim browser were cut
   deliberately. The deployed contract has ruled once, on the sandwich above.
-- **Three of the 144 unit tests prove the mock, not the precompile.** Unit tests run on a bare EVM
+- **Three of the 145 unit tests prove the mock, not the precompile.** Unit tests run on a bare EVM
   where the precompile address holds no code, so `test_MockDecodesLiveMainnetLateralityTo{Fourteen,
   Fifteen,Sixteen}` assert against `MockVerifier`'s Solidity reimplementation. The **real**
   precompile was confirmed separately and live on CC3: `OrderProbe.proveOrder` returned
