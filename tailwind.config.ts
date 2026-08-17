@@ -53,9 +53,19 @@ const config: Config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        // Transform ONLY — deliberately no opacity.
+        //
+        // This animation runs on the hero, and the hero's first line is the LCP element. With
+        // `both` fill and `from { opacity: 0 }` the element held opacity 0 until its animation
+        // ran, so the largest paint could not happen: Lighthouse measured 1,360ms of "element
+        // render delay" against a 2.3s LCP, on a page whose TTFB was only 200ms.
+        //
+        // Animating transform alone keeps every staggered entrance and costs nothing: text is
+        // painted on the first frame and then slides, and because transform is off the layout
+        // path CLS stays 0.
         rise: {
-          from: { opacity: '0', transform: 'translateY(14px)' },
-          to: { opacity: '1', transform: 'none' },
+          from: { transform: 'translateY(14px)' },
+          to: { transform: 'none' },
         },
         land: {
           '0%': { transform: 'scale(0.72)', opacity: '0' },
