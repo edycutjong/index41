@@ -7,11 +7,20 @@ name: deploy
 # production is always a tagged, versioned commit rather than whatever happened
 # to be on main at the time.
 #
-# IMPORTANT — turn OFF Vercel's own Git integration for this project, or every
-# push deploys twice (once by Vercel, once here) and the two race for the alias.
-# In the Vercel dashboard: Project → Settings → Git → disable "Automatic
-# deployments from Git", or commit `{"git": {"deploymentEnabled": false}}` in
-# vercel.json. This workflow is then the single path to production.
+# IMPORTANT — Vercel's own Git integration must not deploy this project, or
+# every push deploys twice (once by Vercel, once here) and the two race for the
+# alias. That is enforced by `{"git": {"deploymentEnabled": false}}` in
+# vercel.json, which Vercel reads from the pushed commit and then stands down.
+# This workflow is the single path to production.
+#
+# The repository is nonetheless CONNECTED to the Vercel project, deliberately.
+# Disconnecting it also works for the double-deploy problem, but Vercel scopes
+# Preview environment variables by Git branch, so on a repo-less project they
+# cannot be created at all: `vercel env add <name> preview` loops on
+# `git_branch_required`, and the branch-scoped form fails outright with
+# "Project does not have a connected Git repository". The `preview` option in
+# workflow_dispatch below was therefore unconfigurable. Connected repo + the
+# vercel.json flag gets both: no automatic deploys, and a usable preview target.
 #
 # Secrets required (Settings → Secrets and variables → Actions). These are
 # GitHub secrets — never a file in this repository:
