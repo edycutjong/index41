@@ -34,6 +34,33 @@ const EVIDENCE_FILES = [
 
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    // Ship the stylesheet inside the document instead of as a render-blocking <link>.
+    //
+    // The hero paragraph is the LCP element and it emits exactly ONE largest-contentful-paint
+    // entry, at the same millisecond as first-contentful-paint. FCP == LCP means there is no
+    // late candidate and no font swap to chase: every millisecond Lighthouse attributes to
+    // "element render delay" is the page waiting to be allowed to paint at all. The only
+    // render-blocking request on the page was this stylesheet.
+    //
+    // A/B on one origin, Pixel 5 emulation, 150ms RTT / 1.6Mbps / 4x CPU, five loads each,
+    // steady state (first load discarded):
+    //
+    //            TTFB     FCP = LCP    paint after TTFB    document (gzip)
+    //   <link>   ~733ms      ~1305ms         ~577ms              26.9 KB
+    //   inline   ~735ms      ~1048ms         ~313ms              48.9 KB
+    //
+    // -256ms of LCP, TTFB untouched. The document nearly doubles because Next emits the CSS
+    // about three times — once as the <style> tag and again inside the flight payload — so the
+    // cost is ~22 KB gzip, not the ~8 KB the stylesheet transfer suggests. It still wins by a
+    // wide margin: 22 KB of extra streaming is worth far less than a serialised round trip that
+    // could not even START until 519ms, because the <head> does not reach the preload scanner
+    // before then. Paint is now bounded by document transfer, which is the floor for this page.
+    //
+    // Re-measure if the CSS grows a lot; the trade reverses once the inlined copies cost more
+    // than the round trip they remove.
+    inlineCss: true,
+  },
   // This repository is public and judge-facing: Next 16 otherwise writes AGENTS.md and CLAUDE.md
   // into the repo root on `next dev`. Those files do not belong here.
   agentRules: false,
