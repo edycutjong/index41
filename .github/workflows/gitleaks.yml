@@ -4,8 +4,9 @@ name: gitleaks
 # catches project-shaped secrets and, with fetch-depth 0, scans the whole history — which is what
 # matters at the private→public flip this repository goes through at submission.
 #
-# Configuration (including the audited allowlist of public keccak event-topic constants) is in
-# .gitleaks.toml at the repo root. Verified locally: 17 commits scanned, no leaks found.
+# Configuration lives in .gitleaks.toml (audited allowlist of public keccak event-topic
+# constants) plus .gitleaksignore (two 8.24.x-only false-positive fingerprints from the
+# pre-rename eth.ts). Verified locally against both gitleaks 8.24.3 and 8.30.1: no leaks.
 
 on:
   push:
@@ -27,7 +28,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: gitleaks/gitleaks-action@v3
+      # Pinned to the SHA verified in run 31999208174 (installs gitleaks 8.24.3). The floating
+      # @v3 tag drifted its bundled gitleaks between two runs on the same commit, which changed
+      # the generic-api-key extraction and turned a clean scan red. .gitleaks.toml is written to
+      # be correct under both the 8.24.x and 8.30.x extraction behaviours; the pin keeps it from
+      # drifting a third way.
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml

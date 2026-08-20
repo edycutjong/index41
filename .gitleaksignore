@@ -1,0 +1,8 @@
+# index41 — full-history false positives under gitleaks 8.24.x
+# The Curve/Uniswap 4byte-selector dictionary in scripts/lib/eth.ts (commit 082a157, pre-rename
+# path) trips generic-api-key ONLY in 8.24.x, whose rule matches across the trailing comma and
+# quotes into the next key. The values are public keccak constants (see the allowlist block in
+# .gitleaks.toml, which covers 8.25+ extraction); these two fingerprints pin the 8.24.x reading.
+# Verified 2026-08-21: clean under both 8.24.3 and 8.30.1 with this file present.
+082a1576e7df8c24a16f73257eaad207656e2dcc:scripts/lib/eth.ts:generic-api-key:108
+082a1576e7df8c24a16f73257eaad207656e2dcc:scripts/lib/eth.ts:generic-api-key:109
