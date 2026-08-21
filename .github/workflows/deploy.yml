@@ -180,7 +180,17 @@ jobs:
       - name: Smoke-test the deployment
         run: |
           set -euo pipefail
-          url="${{ steps.deploy.outputs.url }}"
+          TARGET="${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'production' }}"
+          if [ "$TARGET" = "production" ]; then
+            # Vercel Deployment Protection 302s every unique deployment URL to the SSO
+            # gate (curl gets `vercel.com/sso-api`), so the fresh URL printed by the CLI
+            # cannot be smoke-tested from CI — that is what failed run 32431104234.
+            # `vercel deploy --prod` repoints the public alias before it returns, and the
+            # alias is the surface judges actually open, so smoke-test the alias itself.
+            url="https://index41.edycu.dev"
+          else
+            url="${{ steps.deploy.outputs.url }}"
+          fi
 
           # The page is the whole submission — a deploy that returns 200 but
           # cannot read the chain is a broken demo, so check both.
