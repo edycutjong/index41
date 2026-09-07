@@ -104,6 +104,12 @@ Ethereum transaction hashes from the same block. `Index41.proveSandwich` then:
    `INativeQueryVerifier.calculateTxIndex(merkleProof)` — a free `view` that decodes position out of
    the left/right laterality of the merkle authentication path. Every sibling on the path is one
    bit; the position is the *shape of the proof*, not a claimed field.
+   **Order is load-bearing.** `calculateTxIndex` verifies nothing — it folds the `is_left` flags of
+   whatever siblings it is handed into an integer ([precompile source, pinned commit](https://github.com/gluwa/creditcoin3/blob/06657e9909721f7b55a57f9f3c528739361f0fee/precompiles/block-prover/src/lib.rs#L305)).
+   The contract therefore never reads an index until `verifyAndEmit` has returned `true` for the
+   *same* proof, and reverts (`VerificationFailed`) otherwise. The Creditcoin engineering team
+   confirmed this exact discipline on 2026-09-07: the surface is safe to use *after* `verify` /
+   `verifyAndEmit`, and is left out of the docs only because most builders never need it.
 3. **Asserts the sandwich shape**: `frontRunIndex < victimIndex < backRunIndex`, that all three legs
    emitted a `Swap` log *from the same pool address* (`PoolNotTouched` otherwise — note this is the
    log emitter, not the transaction's `to`, which legitimately differs across routers), the same

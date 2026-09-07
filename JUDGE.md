@@ -48,6 +48,7 @@ Every row was read from the chain, not asserted.
 | The ruling transaction | [`0xd136dea0…d243810`](https://creditcoin-testnet.blockscout.com/tx/0xd136dea0524b7e0e9eba54bf9724eec78597c2598047a96849af727f4d243810) · status `1` · block `5,317,821` · 5 logs |
 | Source of truth | Ethereum **mainnet** block `25,764,741` · 240 transactions · a real MEV sandwich |
 | Positions recovered | **14 → 15 → 16** (searcher buy · victim · searcher sell), from merkle-path laterality via `calculateTxIndex` |
+| Precondition honoured | `calculateTxIndex` is called only after `verifyAndEmit` returned `true` for the same proof (`contracts/src/Index41.sol` `_proveLeg`) — the one condition the Creditcoin engineering team attached when they confirmed the surface safe on 2026-09-07 |
 | Off-chain vs on-chain | `RLLLRRRR→14` · `LLLLRRRR→15` · `RRRRLRRR→16` — the laterality decode and the precompile's own emitted index agree on all three |
 | Ordering assertion | `front 14 < victim 15 < back 16` — holds |
 | Harm paid from the bond | `219,708` wei → `0x51f400…6a1410`, the address the *proof* says was sandwiched. Paid == computed. |
