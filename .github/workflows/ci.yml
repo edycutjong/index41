@@ -47,7 +47,11 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: stable
+          # Pinned, not `stable`: forge 1.8.1 changed how `forge coverage` counts
+          # lines in test helpers (Index41Base.sol 100% -> 78.51%) with no source
+          # change, and turned the 100% gate red on 2026-09-07. 1.7.1 is the last
+          # release measured green on main. Bump deliberately, with fresh numbers.
+          version: v1.7.1
 
       - name: Solidity format check
         run: forge fmt --check
