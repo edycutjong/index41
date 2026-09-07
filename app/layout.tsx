@@ -63,9 +63,9 @@ export const metadata: Metadata = {
     'Ethereum block position',
     'DeFi',
   ],
-  authors: [{ name: 'index41' }],
-  creator: 'index41',
-  publisher: 'index41',
+  authors: [{ name: 'Edy Cu', url: 'https://x.com/edycutjong' }],
+  creator: 'Edy Cu',
+  publisher: 'Edy Cu',
   category: 'technology',
   // phone numbers/addresses are never meaningful here, and iOS Safari otherwise
   // linkifies transaction hashes and block numbers as telephone numbers
@@ -90,6 +90,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@edycutjong',
+    creator: '@edycutjong',
     title: socialTitle,
     description: socialDescription,
     images: ['/og-image-v2.png'],
